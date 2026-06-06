@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Evaluación IPAQ / ASAQ</title>
+    <!-- Librería externa para exportar a un archivo Excel (.xlsx) real con todas las columnas de preguntas -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: var(--surface);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        h2, h3, h4 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .hidden { display: none !important; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background 0.2s;
+            width: 100%;
+            margin-top: 15px;
+        }
+        .btn:hover { background-color: var(--primary-dark); }
+        .btn-secondary { background-color: #64748b; }
+        .btn-secondary:hover { background-color: #475569; }
+        .btn-danger { background-color: var(--danger); }
+        .btn-danger:hover { background-color: #b91c1c; }
+        .btn-audio { background-color: #8b5cf6; margin-bottom: 15px; }
+        .btn-audio:hover { background-color: #6d28d9; }
+
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 500; }
+        input[type="text"], input[type="email"], input[type="number"], input[type="tel"], input[type="password"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        
+        .consent-options {
+            background: #f8fafc;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .radio-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .radio-group input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .pdf-viewer {
+            width: 100%;
+            padding: 20px;
+            border: 2px dashed var(--primary);
+            background: #f0fdf4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .btn-download-pdf {
+            background-color: #0284c7;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-download-pdf:hover { background-color: #0369a1; }
+
+        .question-box {
+            background: #f8fafc;
+            padding: 20px;
+            border-left: 4px solid var(--primary);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 20px;
+        }
+
+        .result-box {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .result-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            font-weight: bold;
+            border-radius: 20px;
+            margin-top: 10px;
+            color: white;
+        }
+        .badge-alto, .badge-activo-sedentario, .badge-activo { background-color: var(--success); }
+        .badge-moderado, .badge-moderado-sedentario { background-color: #eab308; color: black; }
+        .badge-bajo, .badge-inactivo-sedentario { background-color: var(--danger); }
+
+        .table-responsive { overflow-x: auto; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 15px;}
+        th, td { border: 1px solid var(--border); padding: 10px; text-align: left; vertical-align: middle; }
+        th { background-color: #f1f5f9; }
+
+        .component-tag {
+            display: inline-block;
+            background: #e2e8f0;
+            color: #475569;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .day-row {
+            display: grid;
+            grid-template-columns: 120px 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+            background: #ffffff;
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+        .day-name { font-weight: 600; color: #475569; text-transform: capitalize; }
+
+        .matrix-container {
+            position: relative;
+            width: 100%;
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .matrix-img {
+            width: 100%;
+            display: block;
+            height: auto;
+        }
+        .highlight-circle {
+            position: absolute;
+            border: 4px solid #dc2626;
+            border-radius: 50%;
+            background-color: rgba(220, 38, 38, 0.15);
+            pointer-events: none;
+            box-shadow: 0 0 12px #dc2626;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+            animation: pulse-circle 1.5s infinite alternate;
+        }
+        @keyframes pulse-circle {
+            0% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; }
+        }
+
+        .btn-delete-row {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            margin-top: 0;
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- PANTALLA ROLES PRINCIPALES -->
+    <div id="view-role" class="view">
+        <h2>Sistema de Encuestas Académicas</h2>
+        <p style="text-align:center; margin-bottom: 20px;">Por favor, seleccione su modo de ingreso:</p>
+        <button class="btn" onclick="switchView('view-datos-consentimiento')">Ingresar como Participante</button>
+        <button class="btn btn-secondary" onclick="openAdminLogin()">Ingresar como Administrador</button>
+    </div>
+
+    <!-- ACCESO ADMINISTRADOR -->
+    <div id="view-admin-login" class="view hidden">
+        <h3>Acceso Administrador</h3>
+        <div class="form-group">
+            <label>Contraseña:</label>
+            <input type="password" id="admin-pass" placeholder="Ingrese la contraseña">
+        </div>
+        <button class="btn" onclick="loginAdmin()">Ingresar</button>
+        <button class="btn btn-secondary" onclick="switchView('view-role')">Volver</button>
+    </div>
+
+    <!-- DATOS PERSONALES Y CONSENTIMIENTO INFORMADO -->
+    <div id="view-datos-consentimiento" class="view hidden">
+        <h3>Datos Personales</h3>
+        <div class="form-group"><label>Nombre:</label><input type="text" id="p-nombre" required></div>
+        <div class="form-group"><label>Apellidos:</label><input type="text" id="p-apellidos" required></div>
+        <div class="form-group">
+            <label>Sexo:</label>
+            <select id="p-sexo"><option value="Masculino">Masculino</option><option value="Femenino">Femenino</option></select>
+        </div>
+        <div class="form-group"><label>Edad:</label><input type="number" id="p-edad" min="15" max="100" required></div>
+        <div class="form-group"><label>Celular:</label><input type="tel" id="p-celular" required></div>
+        <div class="form-group"><label>Correo Electrónico:</label><input type="email" id="p-correo" required></div>
+
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border);">
+        <h3>Consentimiento Informado</h3>
+        <div class="pdf-viewer" id="pdf-container">
+            <p><strong>Documento cargado por el evaluador:</strong></p>
+            <p style="margin: 5px 0; color: #0f5132; font-weight: 600;">📄 <span id="pdf-name">Consentimiento_Informado_Oficial.pdf</span></p>
+            <button class="btn-download-pdf" id="btn-descargar-participante" onclick="descargarPDFConsentimiento()">
+                📥 Visualizar y Descargar Consentimiento
+            </button>
+        </div>
+
+        <div class="consent-options">
+            <label style="margin-bottom: 10px; font-weight: bold;">Declaración de Consentimiento:</label>
+            <label class="radio-group">
+                <input type="radio" name="rd-consentimiento" value="si" id="rb-acepto-si">
+                <span>Sí, acepto participar voluntariamente del estudio.</span>
+            </label>
+            <label class="radio-group">
+                <input type="radio" name="rd-consentimiento" value="no" id="rb-acepto-no">
+                <span>No acepto participar del estudio.</span>
+            </label>
+        </div>
+
+        <button class="btn" onclick="validarConsentimiento()">Continuar</button>
+    </div>
+
+    <!-- PANTALLA DE AGRADECIMIENTO POR NO ACEPTAR -->
+    <div id="view-no-aceptado" class="view hidden" style="text-align: center; padding: 20px;">
+        <h3 style="color: #475569;">Muchas Gracias</h3>
+        <p style="margin: 15px 0; font-size: 1.1rem;">Agradecemos tu tiempo. Respetamos tu decisión de no formar parte de esta evaluación académica.</p>
+        <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 20px;">El proceso ha finalizado correctamente.</p>
+        <button class="btn btn-secondary" onclick="resetApp()">Volver al Inicio</button>
+    </div>
+
+    <!-- CRITERIOS DE SELECCIÓN Y EXCLUSIÓN -->
+    <div id="view-exclusion" class="view hidden">
+        <h3>Criterios de Selección y Exclusión</h3>
+        <div class="form-group">
+            <label>¿Eres estudiante universitario?</label>
+            <select id="crit-estudiante"><option value="si">Sí</option><option value="no">No</option></select>
+        </div>
+        <div class="form-group">
+            <label>¿Tienes algún diagnóstico discapacitante de carácter físico o mental?</label>
+            <select id="crit-discapacidad"><option value="no">No</option><option value="si">Sí</option></select>
+        </div>
+        <div class="form-group">
+            <label>¿Has presentado una lesión que te genere incapacidad temporal dentro de los últimos 2 meses?</label>
+            <select id="crit-lesion"><option value="no">No</option><option value="si">Sí</option></select>
+        </div>
+        <button class="btn" onclick="evaluarExclusion()">Evaluar e Iniciar Cuestionario</button>
+    </div>
+
+    <!-- PANTALLA EXCLUIDO -->
+    <div id="view-excluido" class="view hidden" style="text-align: center;">
+        <h3 style="color: var(--danger);">No cumple con los criterios</h3>
+        <p>Agradecemos tu interés, pero lamentablemente no cumples con los criterios de selección específicos para este estudio.</p>
+        <button class="btn" onclick="resetApp()">Volver al Inicio</button>
+    </div>
+
+    <!-- CUESTIONARIO DINÁMICO -->
+    <div id="view-questions" class="view hidden">
+        <h3 id="survey-title">Cuestionario</h3>
+        <button class="btn btn-audio" onclick="leerPreguntaActual()">🔊 Escuchar Pregunta</button>
+        
+        <div class="question-box">
+            <div id="question-component" class="component-tag hidden">Componente</div>
+            <p id="question-text" style="font-weight: 600; font-size: 1.1rem; margin-bottom: 15px;"></p>
+            <div id="answers-container"></div>
+        </div>
+        <button class="btn" onclick="siguientePregunta()">Siguiente</button>
+    </div>
+
+    <!-- RESULTADO PARCIAL: IPAQ -->
+    <div id="view-res-ipaq" class="view hidden">
+        <h3>Resultado Parcial: Cuestionario IPAQ</h3>
+        <div class="result-box">
+            <p>Tu nivel de actividad física estimado es:</p>
+            <div id="badge-ipaq" class="result-badge">Cargando...</div>
+            <p style="margin-top:15px; font-weight: bold; color: var(--primary);">Gasto energético: <span id="txt-ipaq-mets">0</span> MET-minutos/semana</p>
+        </div>
+        <button class="btn" onclick="iniciarAsaq()">Continuar al Cuestionario ASAQ</button>
+    </div>
+
+    <!-- RESULTADO PARCIAL: ASAQ -->
+    <div id="view-res-asaq" class="view hidden">
+        <h3>Resultado Parcial: Cuestionario ASAQ</h3>
+        <div class="table-responsive">
+            <h4>Tiempo Sedentario por Componentes (Horas/Semana)</h4>
+            <table id="tabla-asaq-componentes">
+                <thead>
+                    <tr><th>Componente ASAQ</th><th>Total Horas / Semana</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div class="result-box" style="background-color: #f8fafc; border-color: var(--border);">
+            <p style="font-size: 1.1rem; font-weight: bold;">Gasto Sedentario Total Acumulado:</p>
+            <p style="font-size: 1.6rem; color: var(--danger); font-weight: bold;"><span id="txt-asaq-total-horas">0</span> horas/semana</p>
+            <p style="font-size: 0.9rem; color: #64748b; margin-top: 5px;">(Equivale a un promedio diario de <span id="txt-asaq-promedio-diario">0</span> horas)</p>
+        </div>
+        <button class="btn" onclick="mostrarConsolidado()">Continuar al Reporte Final</button>
+    </div>
+
+    <!-- HOJA DE RESULTADOS FINALES -->
+    <div id="view-consolidado" class="view hidden">
+        <h3>Hoja de Resultados Finales</h3>
+        <p style="text-align:center; margin-bottom:20px;">Clasificación integral del nivel de actividad física y conducta sedentaria.</p>
+        
+        <table>
+            <tr><th style="width: 40%;">Prueba / Indicador</th><th>Resultado Numérico y Métricas</th></tr>
+            <tr><td><strong>IPAQ</strong> (Actividad Física)</td><td><span id="lbl-num-ipaq">0</span> MET-min/sem</td></tr>
+            <tr><td><strong>ASAQ</strong> (Sedentarismo)</td><td><span id="lbl-num-asaq">0</span> horas/semana</td></tr>
+        </table>
+
+        <div class="result-box" style="background-color: #f0fdf4; border: 2px solid var(--success); padding: 25px;">
+            <p style="font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; color: #16a34a;">Diagnóstico de Clasificación Cruzada</p>
+            <div id="badge-clasificacion-final" class="result-badge" style="font-size: 1.2rem; padding: 10px 20px; margin: 15px 0;">Calculando perfil...</div>
+            <p id="txt-explicacion-final" style="font-size: 0.95rem; color: #334155; font-weight: 500; margin-bottom: 15px;"></p>
+        </div>
+
+        <h4 style="margin-top: 25px; text-align: left;">Ubicación en la Matriz de Riesgo Cruzado:</h4>
+        <div class="matrix-container">
+            <svg class="matrix-img" viewBox="0 0 1000 520" fill="none" xmlns="http://www.w3.org/2000/svg" style="background:#f8fafc;">
+                <path d="M 90 460 L 960 460" stroke="#d97706" stroke-width="6" marker-end="url(#arrow)"/>
+                <path d="M 90 460 L 90 30" stroke="#334155" stroke-width="6" marker-end="url(#arrow)"/>
+                <text x="525" y="505" fill="#000" font-family="Segoe UI" font-size="20" font-weight="bold" text-anchor="middle">Nivel de Actividad Física (Bajo, Moderado, Alto)</text>
+                <text x="35" y="245" fill="#000" font-family="Segoe UI" font-size="20" font-weight="bold" text-anchor="middle" transform="rotate(-90 35 245)">Nivel de Sedentarismo</text>
+                <text x="65" y="410" fill="#000" font-family="Segoe UI" font-size="18" font-weight="bold" text-anchor="end">Bajo</text>
+                <text x="65" y="255" fill="#000" font-family="Segoe UI" font-size="18" font-weight="bold" text-anchor="end">Moderado</text>
+                <text x="65" y="100" fill="#000" font-family="Segoe UI" font-size="18" font-weight="bold" text-anchor="end">Alto</text>
+                
+                <rect x="110" y="30" width="280" height="130" rx="12" fill="#334155"/>
+                <text x="250" y="105" fill="#fff" font-family="Segoe UI" font-size="22" font-weight="bold" text-anchor="middle">Doble Riesgo</text>
+                <rect x="405" y="30" width="280" height="130" rx="12" fill="#4682b4"/>
+                <text x="545" y="85" fill="#fff" font-family="Segoe UI" font-size="20" font-weight="bold" text-anchor="middle">Riesgo Alto-Mod.</text>
+                <text x="545" y="115" fill="#fff" font-family="Segoe UI" font-size="20" font-weight="bold" text-anchor="middle">Actividad</text>
+                <rect x="700" y="30" width="280" height="130" rx="12" fill="#2c1a04" stroke="#ff4500" stroke-width="3"/>
+                <text x="840" y="85" fill="#ffebcd" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">El Estudiante</text>
+                <text x="840" y="115" fill="#ffebcd" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Paradójico</text>
+                
+                <rect x="110" y="175" width="280" height="130" rx="12" fill="#b0c4de"/>
+                <text x="250" y="230" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Riesgo Mod.-Baja Act.</text>
+                <rect x="405" y="175" width="280" height="130" rx="12" fill="#dae8fc"/>
+                <text x="545" y="230" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Moderado-Moderado</text>
+                <rect x="700" y="175" width="280" height="130" rx="12" fill="#ffe5cc"/>
+                <text x="840" y="230" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Mod.-Alta Actividad</text>
+                
+                <rect x="110" y="320" width="280" height="130" rx="12" fill="#e1e2e5"/>
+                <text x="250" y="390" fill="#1e293b" font-family="Segoe UI" font-size="21" font-weight="bold" text-anchor="middle">Riesgo Pasivo</text>
+                <rect x="405" y="320" width="280" height="130" rx="12" fill="#eaeaea"/>
+                <text x="545" y="375" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Bajo Riesgo-Mod.</text>
+                <text x="545" y="405" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Actividad</text>
+                <rect x="700" y="320" width="280" height="130" rx="12" fill="#d4edda" stroke="#28a745" stroke-width="4"/>
+                <text x="840" y="390" fill="#155724" font-family="Segoe UI" font-size="22" font-weight="bold" text-anchor="middle">Perfil Óptimo</text>
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+                    </marker>
+                </defs>
+            </svg>
+            <div id="matrix-marker" class="highlight-circle" style="width: 29%; height: 26%; top: 50%; left: 50%; display: none;"></div>
+        </div>
+
+        <button class="btn" style="background-color: var(--success);" onclick="finalizarYGuardar()">Terminar y Registrar Respuestas</button>
+    </div>
+
+    <!-- PANEL DE ADMINISTRACIÓN -->
+    <div id="view-admin-panel" class="view hidden">
+        <h2>Panel de Administración</h2>
+        <div style="background: #f1f5f9; padding:15px; border-radius:8px; margin: 15px 0;">
+            <h4>Cargar / Reemplazar PDF de Consentimiento</h4>
+            <input type="file" id="upload-pdf" accept=".pdf" style="margin-top: 10px;">
+            <button class="btn btn-secondary" style="margin-top: 10px; background-color: var(--primary);" onclick="adminGuardarConfiguracion()">Guardar Configuración Administrador</button>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:20px;">
+            <button class="btn" style="background-color: var(--success); margin:0;" onclick="exportarExcelReal()">Exportar a Base de Datos (Excel .xlsx)</button>
+            <button class="btn btn-secondary" style="margin:0;" onclick="resetApp()">Cerrar Sesión</button>
+        </div>
+        <h3 style="margin-top:30px; text-align:left;">Respuestas Registradas (<span id="total-registros">0</span>)</h3>
+        <div class="table-responsive">
+            <table id="tabla-respuestas">
+                <thead>
+                    <tr><th>Nombre</th><th>Edad</th><th>IPAQ (METs)</th><th>ASAQ (Horas/Sem)</th><th>Perfil Final</th><th style="text-align: center;">Acciones</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    let dbRespuestas = JSON.parse(localStorage.getItem('db_encuestas')) || [];
+    let nombrePDF_Actual = localStorage.getItem('nombre_pdf') || "Consentimiento_Informado_Oficial.pdf";
+    let archivoPDF_Base64 = localStorage.getItem('archivo_pdf_b64') || ""; 
+
+    let currentUserData = {};
+    let currentSurvey = 'IPAQ'; 
+    let currentQuestionIdx = 0;
+    let respuestasTemporales = {};
+
+    const preguntasIPAQ = [
+        { id: 'ipaq_vig_dias', texto: 'Vigorosa - Días', tipo: 'select', opciones: [0,1,2,3,4,5,6,7] },
+        { id: 'ipaq_vig_tiempo', texto: 'Vigorosa - Tiempo/Día', tipo: 'tiempo', condicion: () => respuestasTemporales['ipaq_vig_dias'] > 0 },
+        { id: 'ipaq_mod_dias', texto: 'Moderada - Días', tipo: 'select', opciones: [0,1,2,3,4,5,6,7] },
+        { id: 'ipaq_mod_tiempo', texto: 'Moderada - Tiempo/Día', tipo: 'tiempo', condicion: () => respuestasTemporales['ipaq_mod_dias'] > 0 },
+        { id: 'ipaq_cam_dias', texto: 'Caminar - Días', tipo: 'select', opciones: [0,1,2,3,4,5,6,7] },
+        { id: 'ipaq_cam_tiempo', texto: 'Caminar - Tiempo/Día', tipo: 'tiempo', condicion: () => respuestasTemporales['ipaq_cam_dias'] > 0 }
+    ];
+
+    const preguntasASAQ = [
+        { id: 'asaq_1', componente: 'Recreación con pantalla chica', texto: '1. ¿Cuánto tiempo pasas sentado o acostado viendo televisión en cada uno de los siguientes días?' },
+        { id: 'asaq_2', componente: 'Recreación con pantalla chica', texto: '2. ¿Cuánto tiempo pasas sentado o acostado viendo videos/plataformas de contenido multimedia? (películas, series, música o podcast) en cada uno de los siguientes días?' },
+        { id: 'asaq_3', componente: 'Recreación con pantalla chica', texto: '3. ¿Cuánto tiempo pasas sentado o acostado usando la computadora por diversión en cada uno de los siguientes días?' },
+        { id: 'asaq_4', componente: 'Actividades educativas', texto: '4. ¿Cuánto tiempo pasas sentado o acostado haciendo tarea con la computadora en cada uno de los siguientes días?' },
+        { id: 'asaq_5', componente: 'Actividades educativas', texto: '5. ¿Cuánto tiempo pasas sentado o acostado haciendo tarea sin la computadora en cada uno de los siguientes días?' },
+        { id: 'asaq_6', componente: 'Actividades culturales', texto: '6. ¿Cuánto tiempo pasas sentado o acostado leyendo por diversión en cada uno de los siguientes días?' },
+        { id: 'asaq_7', componente: 'Actividades educativas', texto: '7. ¿Cuánto tiempo pasas sentado o acostado en tutorías o clases en cada uno de los siguientes días?' },
+        { id: 'asaq_8', componente: 'Transporte', texto: '8. ¿Cuánto tiempo pasas sentado o acostado trasladándote (auto, camión, micro, motocicleta) en cada uno de los siguientes días?' },
+        { id: 'asaq_9', componente: 'Actividades culturales', texto: '9. ¿Cuánto tiempo pasas sentado o acostado haciendo manualidades o dedicándote a tus pasatiempos en cada uno de los siguientes días?' },
+        { id: 'asaq_10', componente: 'Actividades sociales', texto: '10. ¿Cuánto tiempo pasas sentado o acostado durante tu tiempo libre (mensajeando con amigos o en el celular relajado) en cada uno de los siguientes días?' },
+        { id: 'asaq_11', componente: 'Actividades culturales', texto: '11. ¿Cuánto tiempo pasas sentado o acostado tocando o practicando un instrumento musical en cada uno de los siguientes días?' }
+    ];
+
+    const diasSemana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+
+    function switchView(viewId) {
+        document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+        document.getElementById(viewId).classList.remove('hidden');
+        window.speechSynthesis.cancel(); 
+    }
+
+    function resetApp() {
+        respuestasTemporales = {}; currentUserData = {};
+        nombrePDF_Actual = localStorage.getItem('nombre_pdf') || "Consentimiento_Informado_Oficial.pdf";
+        archivoPDF_Base64 = localStorage.getItem('archivo_pdf_b64') || "";
+        document.getElementById('pdf-name').innerText = nombrePDF_Actual;
+        
+        // Limpiar los selectores de consentimiento
+        const rbSi = document.getElementById('rb-acepto-si');
+        const rbNo = document.getElementById('rb-acepto-no');
+        if(rbSi) rbSi.checked = false;
+        if(rbNo) rbNo.checked = false;
+
+        switchView('view-role');
+    }
+
+    function openAdminLogin() { switchView('view-admin-login'); }
+    
+    function loginAdmin() {
+        if(document.getElementById('admin-pass').value === '@Gi_an300779') {
+            actualizarTablaAdmin(); switchView('view-admin-panel');
+            document.getElementById('admin-pass').value = '';
+        } else { alert('Contraseña incorrecta de Administrador.'); }
+    }
+
+    function adminGuardarConfiguracion() {
+        const fileInput = document.getElementById('upload-pdf');
+        if(fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                archivoPDF_Base64 = e.target.result;
+                nombrePDF_Actual = file.name;
+                
+                localStorage.setItem('nombre_pdf', file.name);
+                localStorage.setItem('archivo_pdf_b64', archivoPDF_Base64);
+                document.getElementById('pdf-name').innerText = file.name;
+                
+                alert(`Configuración guardada. El Consentimiento Informado ha sido actualizado y almacenado con éxito: ${file.name}`);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            alert('Configuración guardada (sin cambios en el archivo PDF).');
+        }
+    }
+
+    function descargarPDFConsentimiento() {
+        if (!archivoPDF_Base64) {
+            alert("El evaluador todavía no ha cargado un archivo PDF personalizado. Se simula la lectura del documento modelo base: " + nombrePDF_Actual);
+            return;
+        }
+        const link = document.createElement('a');
+        link.href = archivoPDF_Base64;
+        link.download = nombrePDF_Actual;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function validarConsentimiento() {
+        const fields = ['p-nombre', 'p-apellidos', 'p-edad', 'p-celular', 'p-correo'];
+        for(let f of fields) { if(!document.getElementById(f).value) { alert('Por favor complete todos sus datos personales obligatorios.'); return; } }
+        
+        const rbSi = document.getElementById('rb-acepto-si').checked;
+        const rbNo = document.getElementById('rb-acepto-no').checked;
+
+        if(!rbSi && !rbNo) { 
+            alert('Debe declarar si acepta o no participar del estudio para continuar.'); 
+            return; 
+        }
+
+        // Si selecciona expresamente que NO acepta, se termina de inmediato el proceso sin ver preguntas
+        if (rbNo) {
+            switchView('view-no-aceptado');
+            return;
+        }
+
+        currentUserData = {
+            nombre: document.getElementById('p-nombre').value, apellidos: document.getElementById('p-apellidos').value,
+            sexo: document.getElementById('p-sexo').value, edad: document.getElementById('p-edad').value,
+            celular: document.getElementById('p-celular').value, correo: document.getElementById('p-correo').value
+        };
+
+        switchView('view-exclusion');
+    }
+
+    function evaluarExclusion() {
+        if (document.getElementById('crit-estudiante').value === 'no' || document.getElementById('crit-discapacidad').value === 'si' || document.getElementById('crit-lesion').value === 'si') {
+            switchView('view-excluido');
+        } else { 
+            currentSurvey = 'IPAQ'; preguntasActuales = preguntasIPAQ; currentQuestionIdx = 0;
+            switchView('view-questions'); mostrarPregunta();
+        }
+    }
+
+    function mostrarPregunta() {
+        if (currentQuestionIdx >= preguntasActuales.length) {
+            if(currentSurvey === 'IPAQ') { calcularIPAQ(); } else { calcularASAQ(); }
+            return;
+        }
+
+        const q = preguntasActuales[currentQuestionIdx];
+        if (q.condicion && !q.condicion()) {
+            respuestasTemporales[q.id] = 0; currentQuestionIdx++; mostrarPregunta(); return;
+        }
+
+        document.getElementById('survey-title').innerText = `Cuestionario ${currentSurvey}`;
+        document.getElementById('question-text').innerText = q.texto;
+        
+        const compTag = document.getElementById('question-component');
+        if(q.componente) {
+            compTag.innerText = q.componente; compTag.classList.remove('hidden');
+        } else { compTag.classList.add('hidden'); }
+
+        const container = document.getElementById('answers-container');
+        container.innerHTML = '';
+
+        if(q.tipo === 'select') {
+            let select = document.createElement('select'); select.id = `input-${q.id}`;
+            q.opciones.forEach(o => {
+                let opt = document.createElement('option'); opt.value = o; opt.innerText = o === 0 ? 'Ningún día' : `${o} días`;
+                select.appendChild(opt);
+            });
+            container.appendChild(select);
+        } 
+        else if(q.tipo === 'tiempo') {
+            container.innerHTML = `
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1;"><label>Horas:</label><input type="number" id="input-${q.id}-h" min="0" max="24" value="0"></div>
+                    <div style="flex:1;"><label>Minutos:</label><input type="number" id="input-${q.id}-m" min="0" max="59" value="0"></div>
+                </div>
+            `;
+        }
+        else {
+            let matrixHtml = `<div style="margin-top:10px; background:#f1f5f9; padding:10px; border-radius:8px;">`;
+            diasSemana.forEach(d => {
+                matrixHtml += `
+                    <div class="day-row">
+                        <span class="day-name">${d}:</span>
+                        <div><input type="number" id="input-${q.id}-${d}-h" min="0" max="24" value="0" placeholder="Hs"></div>
+                        <div><input type="number" id="input-${q.id}-${d}-m" min="0" max="59" value="0" placeholder="Min"></div>
+                    </div>
+                `;
+            });
+            matrixHtml += `</div>`;
+            container.innerHTML = matrixHtml;
+        }
+        setTimeout(leerPreguntaActual, 300);
+    }
+
+    function guardarRespuestaActual() {
+        const q = preguntasActuales[currentQuestionIdx];
+        if (!q) return;
+
+        if(q.tipo === 'select') {
+            respuestasTemporales[q.id] = parseFloat(document.getElementById(`input-${q.id}`).value) || 0;
+        } else if(q.tipo === 'tiempo') {
+            const h = parseInt(document.getElementById(`input-${q.id}-h`).value) || 0;
+            const m = parseInt(document.getElementById(`input-${q.id}-m`).value) || 0;
+            respuestasTemporales[q.id] = (h * 60) + m;
+        } else {
+            respuestasTemporales[q.id] = {};
+            diasSemana.forEach(d => {
+                const h = parseInt(document.getElementById(`input-${q.id}-${d}-h`).value) || 0;
+                const m = parseInt(document.getElementById(`input-${q.id}-${d}-m`).value) || 0;
+                respuestasTemporales[q.id][d] = (h * 60) + m;
+            });
+        }
+    }
+
+    function siguientePregunta() {
+        guardarRespuestaActual(); currentQuestionIdx++; mostrarPregunta();
+    }
+
+    function leerPreguntaActual() {
+        window.speechSynthesis.cancel();
+        const texto = document.getElementById('question-text').innerText;
+        const utterance = new SpeechSynthesisUtterance(texto);
+        utterance.lang = 'es-ES'; window.speechSynthesis.speak(utterance);
+    }
+
+    function calcularIPAQ() {
+        const dV = respuestasTemporales['ipaq_vig_dias'] || 0, mV = respuestasTemporales['ipaq_vig_tiempo'] || 0;
+        const dM = respuestasTemporales['ipaq_mod_dias'] || 0, mM = respuestasTemporales['ipaq_mod_tiempo'] || 0;
+        const dC = respuestasTemporales['ipaq_cam_dias'] || 0, mC = respuestasTemporales['ipaq_cam_tiempo'] || 0;
+
+        const metTotales = (8.0 * dV * mV) + (4.0 * dM * mM) + (3.3 * dC * mC);
+        let inter = "Bajo"; const totalD = dV + dM + dC;
+        
+        if ((dV >= 3 && (8.0*dV*mV) >= 1500) || (totalD >= 7 && metTotales >= 3000)) inter = "Alto";
+        else if ((dV >= 3 && mV >= 20) || (dM >= 5 && mM >= 30) || (dC >= 5 && mC >= 30) || (totalD >= 5 && metTotales >= 600)) inter = "Moderado";
+
+        currentUserData.ipaq_mets = Math.round(metTotales);
+        currentUserData.ipaq_resultado = inter;
+
+        document.getElementById('badge-ipaq').innerText = inter.toUpperCase();
+        document.getElementById('badge-ipaq').className = `result-badge badge-${inter.toLowerCase()}`;
+        document.getElementById('txt-ipaq-mets').innerText = currentUserData.ipaq_mets;
+
+        switchView('view-res-ipaq');
+    }
+
+    function iniciarAsaq() {
+        currentSurvey = 'ASAQ'; preguntasActuales = preguntasASAQ; currentQuestionIdx = 0;
+        switchView('view-questions'); mostrarPregunta();
+    }
+
+    function calcularASAQ() {
+        let componentesSuma = {
+            'Recreación con pantalla chica': 0,
+            'Actividades educativas': 0,
+            'Actividades culturales': 0,
+            'Transporte': 0,
+            'Actividades sociales': 0
+        };
+
+        preguntasASAQ.forEach(q => {
+            const dataDias = respuestasTemporales[q.id] || {};
+            let minutosSemanalesItem = 0;
+            diasSemana.forEach(d => {
+                minutosSemanalesItem += (dataDias[d] || 0);
+            });
+            componentesSuma[q.componente] += (minutosSemanalesItem / 60);
+        });
+
+        let horasSemanalesTotales = 0;
+        const tbody = document.querySelector('#tabla-asaq-componentes tbody');
+        tbody.innerHTML = '';
+
+        for (let comp in componentesSuma) {
+            horasSemanalesTotales += componentesSuma[comp];
+            let row = document.createElement('tr');
+            row.innerHTML = `<td>${comp}</td><td><strong>${componentesSuma[comp].toFixed(1)} hs/sem</strong></td>`;
+            tbody.appendChild(row);
+        }
+
+        const promedioDiario = horasSemanalesTotales / 7;
+        
+        currentUserData.asaq_horas_semana = horasSemanalesTotales.toFixed(1);
+        currentUserData.asaq_promedio_diario = promedioDiario.toFixed(1);
+        currentUserData.componentes_asaq = componentesSuma;
+        currentUserData.asaq_resultado = promedioDiario > 4 ? "Alto Sedentarismo" : "Bajo Sedentarismo";
+
+        document.getElementById('txt-asaq-total-horas').innerText = currentUserData.asaq_horas_semana;
+        document.getElementById('txt-asaq-promedio-diario').innerText = currentUserData.asaq_promedio_diario;
+
+        switchView('view-res-asaq');
+    }
+
+    function mostrarConsolidado() {
+        document.getElementById('lbl-num-ipaq').innerText = currentUserData.ipaq_mets;
+        document.getElementById('lbl-num-asaq').innerText = currentUserData.asaq_horas_semana;
+
+        const met = currentUserData.ipaq_mets;
+        const horasDia = parseFloat(currentUserData.asaq_promedio_diario);
+        
+        let clasificacionFinal = "";
+        let explicacion = "";
+        let colorClase = "";
+        let posX = "50%", posY = "50%";
+
+        if (met >= 3000 && horasDia > 4) {
+            clasificacionFinal = "El Estudiante Paradójico";
+            colorClase = "badge-activo-sedentario";
+            explicacion = "Nivel de actividad física alto, pero pasas demasiadas horas al día sentado debido a las exigencias universitarias.";
+            posX = "84%"; posY = "18%";
+        }
+        else if (met >= 600 && horasDia <= 4) {
+            clasificacionFinal = "Perfil Óptimo";
+            colorClase = "badge-activo";
+            explicacion = "Cumples con las recomendaciones de actividad física y mantienes controlado el sedentarismo.";
+            posX = "84%"; posY = "75%";
+        } 
+        else if (met >= 600 && horasDia > 4) {
+            clasificacionFinal = "Riesgo Alto - Moderada Actividad";
+            colorClase = "badge-activo-sedentario";
+            explicacion = "Realizas actividad física regular, pero el volumen sedentario acumulado mitiga parte de los beneficios cardiovasculares.";
+            posX = "54.5%"; posY = "18%";
+        } 
+        else if (met < 600 && horasDia > 4) {
+            clasificacionFinal = "Doble Riesgo";
+            colorClase = "badge-inactivo-sedentario";
+            explicacion = "No cumples con el gasto mínimo de ejercicio físico semanal y acumulas un tiempo sedentario adverso.";
+            posX = "25%"; posY = "18%";
+        }
+        else if (met < 600 && horasDia <= 4 && horasDia > 2) {
+            clasificacionFinal = "Riesgo Moderado - Baja Actividad";
+            colorClase = "badge-moderado";
+            explicacion = "Tu nivel de entrenamiento estructurado es bajo, compensado parcialmente por pocas horas estáticas.";
+            posX = "25%"; posY = "46%";
+        }
+        else if (met >= 100 && met < 600 && horasDia <= 2) {
+            clasificacionFinal = "Riesgo Pasivo";
+            colorClase = "badge-moderado-sedentario";
+            explicacion = "Nivel sedentario controlado, pero la cuota de estimulación muscular semanal es insuficiente.";
+            posX = "25%"; posY = "75%";
+        }
+        else {
+            clasificacionFinal = "Moderado - Moderado";
+            colorClase = "badge-moderado";
+            explicacion = "Te encuentras en la zona media de ambas clasificaciones cruzadas.";
+            posX = "54.5%"; posY = "46%";
+        }
+
+        currentUserData.perfil_combinado = clasificacionFinal;
+
+        const bFinal = document.getElementById('badge-clasificacion-final');
+        bFinal.innerText = clasificacionFinal.toUpperCase();
+        bFinal.className = `result-badge ${colorClase}`;
+        document.getElementById('txt-explicacion-final').innerText = explicacion;
+
+        const marker = document.getElementById('matrix-marker');
+        marker.style.left = posX; marker.style.top = posY; marker.style.display = "block";
+
+        switchView('view-consolidado');
+    }
+
+    function finalizarYGuardar() {
+        dbRespuestas.push({ ...currentUserData, respuestas_detalladas: { ...respuestasTemporales }, fecha_registro: new Date().toLocaleString() });
+        localStorage.setItem('db_encuestas', JSON.stringify(dbRespuestas));
+        alert('Respuestas registradas con éxito.'); resetApp();
+    }
+
+    function actualizarTablaAdmin() {
+        const tbody = document.querySelector('#tabla-respuestas tbody'); tbody.innerHTML = '';
+        document.getElementById('total-registros').innerText = dbRespuestas.length;
+        dbRespuestas.forEach((r, idx) => {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${r.nombre} ${r.apellidos}</td>
+                <td>${r.edad}</td>
+                <td>${r.ipaq_mets} METs</td>
+                <td>${r.asaq_horas_semana} hs/sem</td>
+                <td><strong>${r.perfil_combinado}</strong></td>
+                <td style="text-align: center;">
+                    <button class="btn btn-danger btn-delete-row" onclick="eliminarRespuesta(${idx})">🗑️ Eliminar</button>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function eliminarRespuesta(idx) {
+        if(confirm("¿Está seguro de que desea eliminar permanentemente este registro del participante?")) {
+            dbRespuestas.splice(idx, 1);
+            localStorage.setItem('db_encuestas', JSON.stringify(dbRespuestas));
+            actualizarTablaAdmin();
+        }
+    }
+
+    function exportarExcelReal() {
+        if(dbRespuestas.length === 0) { alert('No existen registros para exportar.'); return; }
+        
+        let datosFormateados = dbRespuestas.map(r => {
+            let fila = {
+                "Fecha Registro": r.fecha_registro,
+                "Nombre": r.nombre,
+                "Apellidos": r.apellidos,
+                "Edad": r.edad,
+                "Sexo": r.sexo,
+                "Celular": r.celular,
+                "Correo": r.correo,
+                "IPAQ (METs)": r.ipaq_mets,
+                "IPAQ Nivel": r.ipaq_resultado,
+                "ASAQ (Horas/Semana)": parseFloat(r.asaq_horas_semana),
+                "ASAQ Promedio Diario (Horas)": parseFloat(r.asaq_promedio_diario),
+                "Perfil Final Combinado": r.perfil_combinado
+            };
+
+            preguntasIPAQ.forEach(q => {
+                let resp = r.respuestas_detalladas ? r.respuestas_detalladas[q.id] : "";
+                fila[`IPAQ_${q.id}`] = typeof resp === 'object' ? JSON.stringify(resp) : resp;
+            });
+
+            preguntasASAQ.forEach(q => {
+                let resp = r.respuestas_detalladas ? r.respuestas_detalladas[q.id] : "";
+                if(resp && typeof resp === 'object') {
+                    diasSemana.forEach(d => {
+                        fila[`ASAQ_P${q.id.replace('asaq_','')}_Minutos_${d}`] = resp[d] || 0;
+                    });
+                } else {
+                    fila[`ASAQ_${q.id}`] = resp || 0;
+                }
+            });
+
+            return fila;
+        });
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(datosFormateados);
+        XLSX.utils.book_append_sheet(wb, ws, "Participantes");
+        XLSX.writeFile(wb, "Matriz_Evaluacion_Completa.xlsx");
+    }
+
+    window.onload = resetApp;
+</script>
+</body>
+</html>
