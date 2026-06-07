@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Evaluación IPAQ / ASAQ</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -66,6 +67,8 @@
         .btn:hover { background-color: var(--primary-dark); }
         .btn-secondary { background-color: #64748b; }
         .btn-secondary:hover { background-color: #475569; }
+        .btn-danger { background-color: var(--danger); }
+        .btn-danger:hover { background-color: #b91c1c; }
         .btn-audio { background-color: #8b5cf6; margin-bottom: 15px; }
         .btn-audio:hover { background-color: #6d28d9; }
 
@@ -215,6 +218,13 @@
             0% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.8; }
             100% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; }
         }
+
+        .btn-delete-row {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            margin-top: 0;
+            width: auto;
+        }
     </style>
 </head>
 <body>
@@ -283,7 +293,7 @@
     </div>
 
     <div id="view-excluido" class="view hidden" style="text-align: center;">
-        <h3 style="color: #dc2626;">No cumple con los criterios</h3>
+        <h3 style="color: var(--danger);">No cumple con los criterios</h3>
         <p>Agradecemos tu interés, pero lamentablemente no cumples con los criterios de selección específicos para este estudio.</p>
         <button class="btn" onclick="resetApp()">Volver al Inicio</button>
     </div>
@@ -393,7 +403,9 @@
 </div>
 
 <script>
+    let dbRespuestas = JSON.parse(localStorage.getItem('db_encuestas')) || [];
     let nombrePDF_Actual = "CONSENTIMIENTO_INFORMADO.pdf";
+
     let currentUserData = {};
     let currentSurvey = 'IPAQ'; 
     let currentQuestionIdx = 0;
@@ -434,13 +446,14 @@
         respuestasTemporales = {}; currentUserData = {};
         document.getElementById('pdf-name').innerText = nombrePDF_Actual;
         
-        // Limpiar campos del formulario
-        const inputs = ['p-nombre', 'p-apellidos', 'p-edad', 'p-celular', 'p-correo'];
-        inputs.forEach(id => {
-            const el = document.getElementById(id);
+        // Limpiar inputs de datos personales
+        const fields = ['p-nombre', 'p-apellidos', 'p-edad', 'p-celular', 'p-correo'];
+        fields.forEach(f => {
+            const el = document.getElementById(f);
             if(el) el.value = '';
         });
 
+        // Limpiar los selectores de consentimiento
         const rbSi = document.getElementById('rb-acepto-si');
         const rbNo = document.getElementById('rb-acepto-no');
         if(rbSi) rbSi.checked = false;
@@ -453,7 +466,7 @@
         const rutaPDF = "CONSENTIMIENTO_INFORMADO.pdf";
         const link = document.createElement('a');
         link.href = rutaPDF;
-        link.target = "_blank";
+        link.target = "_blank"; 
         link.download = "CONSENTIMIENTO_INFORMADO.pdf";
         document.body.appendChild(link);
         link.click();
@@ -602,10 +615,6 @@
         switchView('view-res-ipaq');
     }
 
-    function abrirEnlaceExterno(url) {
-        window.open(url, '_blank');
-    }
-
     function iniciarAsaq() {
         currentSurvey = 'ASAQ'; preguntasActuales = preguntasASAQ; currentQuestionIdx = 0;
         switchView('view-questions'); mostrarPregunta();
@@ -680,7 +689,7 @@
         else if (met >= 600 && horasDia > 4) {
             clasificacionFinal = "Riesgo Alto - Moderada Actividad";
             colorClase = "badge-activo-sedentario";
-            explicacion = "Reflejas un nivel de ejercicio estructurado aceptable, pero las horas continuas de inmovilidad demandan pausas activas regulares.";
+            explicacion = "Realizas actividad física regular, pero el volumen sedentario acumulado mitiga parte de los beneficios cardiovasculares.";
             posX = "54.5%"; posY = "18%";
         } 
         else if (met < 600 && horasDia > 4) {
