@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Evaluación IPAQ / ASAQ</title>
-    <!-- Librería externa para exportar a un archivo Excel (.xlsx) real con todas las columnas de preguntas -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -231,7 +230,6 @@
 <body>
 
 <div class="container">
-    <!-- PANTALLA ROLES PRINCIPALES -->
     <div id="view-role" class="view">
         <h2>Sistema de Encuestas Académicas</h2>
         <p style="text-align:center; margin-bottom: 20px;">Por favor, seleccione su modo de ingreso:</p>
@@ -239,7 +237,6 @@
         <button class="btn btn-secondary" onclick="openAdminLogin()">Ingresar como Administrador</button>
     </div>
 
-    <!-- ACCESO ADMINISTRADOR -->
     <div id="view-admin-login" class="view hidden">
         <h3>Acceso Administrador</h3>
         <div class="form-group">
@@ -250,7 +247,6 @@
         <button class="btn btn-secondary" onclick="switchView('view-role')">Volver</button>
     </div>
 
-    <!-- DATOS PERSONALES Y CONSENTIMIENTO INFORMADO -->
     <div id="view-datos-consentimiento" class="view hidden">
         <h3>Datos Personales</h3>
         <div class="form-group"><label>Nombre:</label><input type="text" id="p-nombre" required></div>
@@ -267,7 +263,7 @@
         <h3>Consentimiento Informado</h3>
         <div class="pdf-viewer" id="pdf-container">
             <p><strong>Documento cargado por el evaluador:</strong></p>
-            <p style="margin: 5px 0; color: #0f5132; font-weight: 600;">📄 <span id="pdf-name">Consentimiento_Informado_Oficial.pdf</span></p>
+            <p style="margin: 5px 0; color: #0f5132; font-weight: 600;">📄 <span id="pdf-name">CONSENTIMIENTO_INFORMADO.pdf</span></p>
             <button class="btn-download-pdf" id="btn-descargar-participante" onclick="descargarPDFConsentimiento()">
                 📥 Visualizar y Descargar Consentimiento
             </button>
@@ -288,7 +284,6 @@
         <button class="btn" onclick="validarConsentimiento()">Continuar</button>
     </div>
 
-    <!-- PANTALLA DE AGRADECIMIENTO POR NO ACEPTAR -->
     <div id="view-no-aceptado" class="view hidden" style="text-align: center; padding: 20px;">
         <h3 style="color: #475569;">Muchas Gracias</h3>
         <p style="margin: 15px 0; font-size: 1.1rem;">Agradecemos tu tiempo. Respetamos tu decisión de no formar parte de esta evaluación académica.</p>
@@ -296,7 +291,6 @@
         <button class="btn btn-secondary" onclick="resetApp()">Volver al Inicio</button>
     </div>
 
-    <!-- CRITERIOS DE SELECCIÓN Y EXCLUSIÓN -->
     <div id="view-exclusion" class="view hidden">
         <h3>Criterios de Selección y Exclusión</h3>
         <div class="form-group">
@@ -314,14 +308,12 @@
         <button class="btn" onclick="evaluarExclusion()">Evaluar e Iniciar Cuestionario</button>
     </div>
 
-    <!-- PANTALLA EXCLUIDO -->
     <div id="view-excluido" class="view hidden" style="text-align: center;">
         <h3 style="color: var(--danger);">No cumple con los criterios</h3>
         <p>Agradecemos tu interés, pero lamentablemente no cumples con los criterios de selección específicos para este estudio.</p>
         <button class="btn" onclick="resetApp()">Volver al Inicio</button>
     </div>
 
-    <!-- CUESTIONARIO DINÁMICO -->
     <div id="view-questions" class="view hidden">
         <h3 id="survey-title">Cuestionario</h3>
         <button class="btn btn-audio" onclick="leerPreguntaActual()">🔊 Escuchar Pregunta</button>
@@ -334,7 +326,6 @@
         <button class="btn" onclick="siguientePregunta()">Siguiente</button>
     </div>
 
-    <!-- RESULTADO PARCIAL: IPAQ -->
     <div id="view-res-ipaq" class="view hidden">
         <h3>Resultado Parcial: Cuestionario IPAQ</h3>
         <div class="result-box">
@@ -345,7 +336,6 @@
         <button class="btn" onclick="iniciarAsaq()">Continuar al Cuestionario ASAQ</button>
     </div>
 
-    <!-- RESULTADO PARCIAL: ASAQ -->
     <div id="view-res-asaq" class="view hidden">
         <h3>Resultado Parcial: Cuestionario ASAQ</h3>
         <div class="table-responsive">
@@ -365,7 +355,6 @@
         <button class="btn" onclick="mostrarConsolidado()">Continuar al Reporte Final</button>
     </div>
 
-    <!-- HOJA DE RESULTADOS FINALES -->
     <div id="view-consolidado" class="view hidden">
         <h3>Hoja de Resultados Finales</h3>
         <p style="text-align:center; margin-bottom:20px;">Clasificación integral del nivel de actividad física y conducta sedentaria.</p>
@@ -428,7 +417,6 @@
         <button class="btn" style="background-color: var(--success);" onclick="finalizarYGuardar()">Terminar y Registrar Respuestas</button>
     </div>
 
-    <!-- PANEL DE ADMINISTRACIÓN -->
     <div id="view-admin-panel" class="view hidden">
         <h2>Panel de Administración</h2>
         <div style="background: #f1f5f9; padding:15px; border-radius:8px; margin: 15px 0;">
@@ -454,7 +442,8 @@
 
 <script>
     let dbRespuestas = JSON.parse(localStorage.getItem('db_encuestas')) || [];
-    let nombrePDF_Actual = localStorage.getItem('nombre_pdf') || "Consentimiento_Informado_Oficial.pdf";
+    // PASO 4 MODIFICADO: Ajuste del valor por defecto de la variable global a mayúsculas
+    let nombrePDF_Actual = localStorage.getItem('nombre_pdf') || "CONSENTIMIENTO_INFORMADO.pdf";
     let archivoPDF_Base64 = localStorage.getItem('archivo_pdf_b64') || ""; 
 
     let currentUserData = {};
@@ -495,7 +484,8 @@
 
     function resetApp() {
         respuestasTemporales = {}; currentUserData = {};
-        nombrePDF_Actual = localStorage.getItem('nombre_pdf') || "Consentimiento_Informado_Oficial.pdf";
+        // PASO 4 MODIFICADO: Ajuste del valor por defecto también en la inicialización/reinicio de la app
+        nombrePDF_Actual = localStorage.getItem('nombre_pdf') || "CONSENTIMIENTO_INFORMADO.pdf";
         archivoPDF_Base64 = localStorage.getItem('archivo_pdf_b64') || "";
         document.getElementById('pdf-name').innerText = nombrePDF_Actual;
         
@@ -540,13 +530,15 @@
     }
 
     function descargarPDFConsentimiento() {
-        if (!archivoPDF_Base64) {
-            alert("El evaluador todavía no ha cargado un archivo PDF personalizado. Se simula la lectura del documento modelo base: " + nombrePDF_Actual);
-            return;
-        }
+        // Al estar ambos archivos en la misma carpeta de GitHub, la ruta es directa
+        const rutaPDF = "CONSENTIMIENTO_INFORMADO.pdf";
+        
+        // Crear un enlace temporal para forzar la apertura/descarga del documento
         const link = document.createElement('a');
-        link.href = archivoPDF_Base64;
-        link.download = nombrePDF_Actual;
+        link.href = rutaPDF;
+        link.target = "_blank"; // Abre el PDF en una pestaña nueva para que puedan leerlo cómodamente
+        link.download = "CONSENTIMIENTO_INFORMADO.pdf";
+        
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -811,43 +803,42 @@
     }
 
     function finalizarYGuardar() {
-    // Agrega la URL que te dio Google Apps Script al implementar
-    const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbxUKeudP6-ERSYbeiw9ruSBautt8JMA2I6tS4wqV0gF5U5Y0N-8PJyG8YEm46Odp7o/exec"; 
+        // Agrega la URL que te dio Google Apps Script al implementar
+        const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbxUKeudP6-ERSYbeiw9ruSBautt8JMA2I6tS4wqV0gF5U5Y0N-8PJyG8YEm46Odp7o/exec"; 
 
-    // Al agregar el diagnóstico cruzado al objeto, nos aseguramos de que vaya completo a la nube
-    currentUserData.perfil_combinado = document.getElementById('badge-clasificacion-final').innerText;
+        // Al agregar el diagnóstico cruzado al objeto, nos aseguramos de que vaya completo a la nube
+        currentUserData.perfil_combinado = document.getElementById('badge-clasificacion-final').innerText;
 
-    // Deshabilitar temporalmente el botón para evitar que el usuario haga doble clic rápido
-    const botonTerminar = document.querySelector("button[onclick='finalizarYGuardar()']");
-    if(botonTerminar) {
-        botonTerminar.innerText = "⏳ Guardando en la nube...";
-        botonTerminar.disabled = true;
-    }
-
-    // Enviar los datos en tiempo real mediante la API Fetch
-    fetch(URL_GOOGLE_SCRIPT, {
-        method: "POST",
-        mode: "no-cors", // Evita problemas de políticas CORS en navegadores estrictos
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(currentUserData)
-    })
-    .then(() => {
-        // Al usar 'no-cors' la respuesta llega opaca, asumimos éxito si no salta al catch
-        alert('¡Respuestas registradas con éxito en la base de datos central!');
-        resetApp();
-    })
-    .catch(error => {
-        console.error("Error al enviar los datos:", error);
-        alert('Hubo un problema de conexión al guardar los datos. Inténtalo de nuevo.');
+        // Deshabilitar temporalmente el botón para evitar que el usuario haga doble clic rápido
+        const botonTerminar = document.querySelector("button[onclick='finalizarYGuardar()']");
         if(botonTerminar) {
-            botonTerminar.innerText = "Terminar y Registrar Respuestas";
-            botonTerminar.disabled = false;
+            botonTerminar.innerText = "⏳ Guardando en la nube...";
+            botonTerminar.disabled = true;
         }
-    });
-}
- 
+
+        // Enviar los datos en tiempo real mediante la API Fetch
+        fetch(URL_GOOGLE_SCRIPT, {
+            method: "POST",
+            mode: "no-cors", // Evita problemas de políticas CORS en navegadores estrictos
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(currentUserData)
+        })
+        .then(() => {
+            // Al usar 'no-cors' la respuesta llega opaca, asumimos éxito si no salta al catch
+            alert('¡Respuestas registradas con éxito en la base de datos central!');
+            resetApp();
+        })
+        .catch(error => {
+            console.error("Error al enviar los datos:", error);
+            alert('Hubo un problema de conexión al guardar los datos. Inténtalo de nuevo.');
+            if(botonTerminar) {
+                botonTerminar.innerText = "Terminar y Registrar Respuestas";
+                botonTerminar.disabled = false;
+            }
+        });
+    }
 
     function actualizarTablaAdmin() {
         const tbody = document.querySelector('#tabla-respuestas tbody'); tbody.innerHTML = '';
