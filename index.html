@@ -74,7 +74,7 @@
 
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: 500; }
-        input[type="text"], input[type="email"], input[type="number"], input[type="tel"], select {
+        input[type="text"], input[type="email"], input[type="number"], input[type="tel"], input[type="password"], select {
             width: 100%;
             padding: 10px;
             border: 1px solid var(--border);
@@ -230,8 +230,24 @@
 <body>
 
 <div class="container">
-    <div id="view-datos-consentimiento" class="view">
+    <div id="view-role" class="view">
         <h2>Sistema de Encuestas Académicas</h2>
+        <p style="text-align:center; margin-bottom: 20px;">Por favor, seleccione su modo de ingreso:</p>
+        <button class="btn" onclick="switchView('view-datos-consentimiento')">Ingresar como Participante</button>
+        <button class="btn btn-secondary" onclick="openAdminLogin()">Ingresar como Administrador</button>
+    </div>
+
+    <div id="view-admin-login" class="view hidden">
+        <h3>Acceso Administrador</h3>
+        <div class="form-group">
+            <label>Contraseña:</label>
+            <input type="password" id="admin-pass" placeholder="Ingrese la contraseña">
+        </div>
+        <button class="btn" onclick="loginAdmin()">Ingresar</button>
+        <button class="btn btn-secondary" onclick="switchView('view-role')">Volver</button>
+    </div>
+
+    <div id="view-datos-consentimiento" class="view hidden">
         <h3>Datos Personales</h3>
         <div class="form-group"><label>Nombre:</label><input type="text" id="p-nombre" required></div>
         <div class="form-group"><label>Apellidos:</label><input type="text" id="p-apellidos" required></div>
@@ -247,7 +263,7 @@
         <h3>Consentimiento Informado</h3>
         <div class="pdf-viewer" id="pdf-container">
             <p><strong>Documento cargado por el evaluador:</strong></p>
-            <p style="margin: 5px 0; color: #0f5132; font-weight: 600;">📄 <span id="pdf-name">CONSENTIMIENTO_INFORMADO.pdf</span></p>
+            <p style="margin: 5px 0; color: #0f5132; font-weight: 600;">📄 <span id="pdf-name">Consentimiento_Informado_Oficial.pdf</span></p>
             <button class="btn-download-pdf" id="btn-descargar-participante" onclick="descargarPDFConsentimiento()">
                 📥 Visualizar y Descargar Consentimiento
             </button>
@@ -400,11 +416,34 @@
 
         <button class="btn" style="background-color: var(--success);" onclick="finalizarYGuardar()">Terminar y Registrar Respuestas</button>
     </div>
+
+    <div id="view-admin-panel" class="view hidden">
+        <h2>Panel de Administración</h2>
+        <div style="background: #f1f5f9; padding:15px; border-radius:8px; margin: 15px 0;">
+            <h4>Cargar / Reemplazar PDF de Consentimiento</h4>
+            <input type="file" id="upload-pdf" accept=".pdf" style="margin-top: 10px;">
+            <button class="btn btn-secondary" style="margin-top: 10px; background-color: var(--primary);" onclick="adminGuardarConfiguracion()">Guardar Configuración Administrador</button>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:20px;">
+            <button class="btn" style="background-color: var(--success); margin:0;" onclick="exportarExcelReal()">Exportar a Base de Datos (Excel .xlsx)</button>
+            <button class="btn btn-secondary" style="margin:0;" onclick="resetApp()">Cerrar Sesión</button>
+        </div>
+        <h3 style="margin-top:30px; text-align:left;">Respuestas Registradas (<span id="total-registros">0</span>)</h3>
+        <div class="table-responsive">
+            <table id="tabla-respuestas">
+                <thead>
+                    <tr><th>Nombre</th><th>Edad</th><th>IPAQ (METs)</th><th>ASAQ (Horas/Sem)</th><th>Perfil Final</th><th style="text-align: center;">Acciones</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <script>
     let dbRespuestas = JSON.parse(localStorage.getItem('db_encuestas')) || [];
-    let nombrePDF_Actual = "CONSENTIMIENTO_INFORMADO.pdf";
+    let nombrePDF_Actual = localStorage.getItem('nombre_pdf') || "CONSENTIMIENTO_INFORMADO.pdf";
+    let archivoPDF_Base64 = localStorage.getItem('archivo_pdf_b64') || ""; 
 
     let currentUserData = {};
     let currentSurvey = 'IPAQ'; 
@@ -412,12 +451,42 @@
     let respuestasTemporales = {};
 
     const preguntasIPAQ = [
-        { id: 'ipaq_vig_dias', texto: 'Vigorosa - Días', tipo: 'select', opciones: [0,1,2,3,4,5,6,7] },
-        { id: 'ipaq_vig_tiempo', texto: 'Vigorosa - Tiempo/Día', tipo: 'tiempo', condicion: () => respuestasTemporales['ipaq_vig_dias'] > 0 },
-        { id: 'ipaq_mod_dias', texto: 'Moderada - Días', tipo: 'select', opciones: [0,1,2,3,4,5,6,7] },
-        { id: 'ipaq_mod_tiempo', texto: 'Moderada - Tiempo/Día', tipo: 'tiempo', condicion: () => respuestasTemporales['ipaq_mod_dias'] > 0 },
-        { id: 'ipaq_cam_dias', texto: 'Caminar - Días', tipo: 'select', opciones: [0,1,2,3,4,5,6,7] },
-        { id: 'ipaq_cam_tiempo', texto: 'Caminar - Tiempo/Día', tipo: 'tiempo', condicion: () => respuestasTemporales['ipaq_cam_dias'] > 0 }
+        { 
+            id: 'ipaq_vig_dias', 
+            texto: 'Durante los últimos 7 días, ¿en cuántos días realizó actividades físicas vigorosas como levantar objetos pesados, excavar, hacer aeróbicos o andar en bicicleta a alta velocidad?', 
+            tipo: 'select', 
+            opciones: [0,1,2,3,4,5,6,7] 
+        },
+        { 
+            id: 'ipaq_vig_tiempo', 
+            texto: '¿Cuánto tiempo pasa habitualmente realizando actividades físicas vigorosas en uno de esos días?', 
+            tipo: 'tiempo', 
+            condicion: () => respuestasTemporales['ipaq_vig_dias'] > 0 
+        },
+        { 
+            id: 'ipaq_mod_dias', 
+            texto: 'Durante los últimos 7 días, ¿en cuántos días realizó actividades físicas moderadas como transportar objetos ligeros, andar en bicicleta a velocidad regular o jugar dobles de tenis? (No incluya caminar)', 
+            tipo: 'select', 
+            opciones: [0,1,2,3,4,5,6,7] 
+        },
+        { 
+            id: 'ipaq_mod_tiempo', 
+            texto: '¿Cuánto tiempo pasa habitualmente realizando actividades físicas moderadas en uno de esos días?', 
+            tipo: 'tiempo', 
+            condicion: () => respuestasTemporales['ipaq_mod_dias'] > 0 
+        },
+        { 
+            id: 'ipaq_cam_dias', 
+            texto: 'Durante los últimos 7 días, ¿en cuántos días caminó durante al menos 10 minutos seguidos (esto incluye caminatas en el trabajo, en la casa, para trasladarse o por recreación)?', 
+            tipo: 'select', 
+            opciones: [0,1,2,3,4,5,6,7] 
+        },
+        { 
+            id: 'ipaq_cam_tiempo', 
+            texto: '¿Cuánto tiempo pasa habitualmente caminando en uno de esos días?', 
+            tipo: 'tiempo', 
+            condicion: () => respuestasTemporales['ipaq_cam_dias'] > 0 
+        }
     ];
 
     const preguntasASAQ = [
@@ -444,22 +513,48 @@
 
     function resetApp() {
         respuestasTemporales = {}; currentUserData = {};
+        nombrePDF_Actual = localStorage.getItem('nombre_pdf') || "CONSENTIMIENTO_INFORMADO.pdf";
+        archivoPDF_Base64 = localStorage.getItem('archivo_pdf_b64') || "";
         document.getElementById('pdf-name').innerText = nombrePDF_Actual;
         
-        // Limpiar inputs de datos personales
-        const fields = ['p-nombre', 'p-apellidos', 'p-edad', 'p-celular', 'p-correo'];
-        fields.forEach(f => {
-            const el = document.getElementById(f);
-            if(el) el.value = '';
-        });
-
         // Limpiar los selectores de consentimiento
         const rbSi = document.getElementById('rb-acepto-si');
         const rbNo = document.getElementById('rb-acepto-no');
         if(rbSi) rbSi.checked = false;
         if(rbNo) rbNo.checked = false;
 
-        switchView('view-datos-consentimiento');
+        switchView('view-role');
+    }
+
+    function openAdminLogin() { switchView('view-admin-login'); }
+    
+    function loginAdmin() {
+        if(document.getElementById('admin-pass').value === '@Gi_an300779') {
+            actualizarTablaAdmin(); switchView('view-admin-panel');
+            document.getElementById('admin-pass').value = '';
+        } else { alert('Contraseña incorrecta de Administrador.'); }
+    }
+
+    function adminGuardarConfiguracion() {
+        const fileInput = document.getElementById('upload-pdf');
+        if(fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                archivoPDF_Base64 = e.target.result;
+                nombrePDF_Actual = file.name;
+                
+                localStorage.setItem('nombre_pdf', file.name);
+                localStorage.setItem('archivo_pdf_b64', archivoPDF_Base64);
+                document.getElementById('pdf-name').innerText = file.name;
+                
+                alert(`Configuración guardada. El Consentimiento Informado ha sido actualizado y almacenado con éxito: ${file.name}`);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            alert('Configuración guardada (sin cambios en el archivo PDF).');
+        }
     }
 
     function descargarPDFConsentimiento() {
@@ -468,6 +563,7 @@
         link.href = rutaPDF;
         link.target = "_blank"; 
         link.download = "CONSENTIMIENTO_INFORMADO.pdf";
+        
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -761,6 +857,76 @@
                 botonTerminar.disabled = false;
             }
         });
+    }
+
+    function actualizarTablaAdmin() {
+        const tbody = document.querySelector('#tabla-respuestas tbody'); tbody.innerHTML = '';
+        document.getElementById('total-registros').innerText = dbRespuestas.length;
+        dbRespuestas.forEach((r, idx) => {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${r.nombre} ${r.apellidos}</td>
+                <td>${r.edad}</td>
+                <td>${r.ipaq_mets} METs</td>
+                <td>${r.asaq_horas_semana} hs/sem</td>
+                <td><strong>${r.perfil_combinado}</strong></td>
+                <td style="text-align: center;">
+                    <button class="btn btn-danger btn-delete-row" onclick="eliminarRespuesta(${idx})">🗑️ Eliminar</button>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function eliminarRespuesta(idx) {
+        if(confirm("¿Está seguro de que desea eliminar permanentemente este registro del participante?")) {
+            dbRespuestas.splice(idx, 1);
+            localStorage.setItem('db_encuestas', JSON.stringify(dbRespuestas));
+            actualizarTablaAdmin();
+        }
+    }
+
+    function exportarExcelReal() {
+        if(dbRespuestas.length === 0) { alert('No existen registros para exportar.'); return; }
+        
+        let datosFormateados = dbRespuestas.map(r => {
+            let fila = {
+                "Fecha Registro": r.fecha_registro,
+                "Nombre": r.nombre,
+                "Apellidos": r.apellidos,
+                "Edad": r.edad,
+                "Sexo": r.sexo,
+                "Celular": r.celular,
+                "Correo": r.correo,
+                "IPAQ (METs)": r.ipaq_mets,
+                "IPAQ Nivel": r.ipaq_resultado,
+                "ASAQ (Horas/Semana)": parseFloat(r.asaq_horas_semana),
+                "ASAQ Promedio Diario (Horas)": parseFloat(r.asaq_promedio_diario),
+                "Perfil Final Combinado": r.perfil_combinado
+            };
+
+            preguntasIPAQ.forEach(q => {
+                let resp = r.respuestas_detalladas ? r.respuestas_detalladas[q.id] : "";
+                fila[`IPAQ_${q.id}`] = typeof resp === 'object' ? JSON.stringify(resp) : resp;
+            });
+
+            preguntasASAQ.forEach(q => {
+                let resp = r.respuestas_detalladas ? r.respuestas_detalladas[q.id] : "";
+                if(resp && typeof resp === 'object') {
+                    diasSemana.forEach(d => {
+                        fila[`ASAQ_P${q.id.replace('asaq_','')}_Minutos_${d}`] = resp[d] || 0;
+                    });
+                } else {
+                    fila[`ASAQ_${q.id}`] = resp || 0;
+                }
+            });
+
+            return fila;
+        });
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(datosFormateados);
+        XLSX.utils.book_append_sheet(wb, ws, "Participantes");
+        XLSX.writeFile(wb, "Matriz_Evaluacion_Completa.xlsx");
     }
 
     window.onload = resetApp;
