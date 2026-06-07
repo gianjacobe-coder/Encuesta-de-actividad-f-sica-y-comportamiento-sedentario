@@ -157,9 +157,9 @@
             margin-top: 10px;
             color: white;
         }
-        .badge-alto, .badge-activo-sedentario, .badge-activo { background-color: var(--success); }
-        .badge-moderado, .badge-moderado-sedentario { background-color: #eab308; color: black; }
-        .badge-bajo, .badge-inactivo-sedentario { background-color: var(--danger); }
+        .badge-alto, .badge-activo-sedentario, .badge-activo, .badge-optimo { background-color: var(--success); }
+        .badge-moderado, .badge-moderado-sedentario, .badge-alviso, .badge-modmod { background-color: #eab308; color: black; }
+        .badge-bajo, .badge-inactivo-sedentario, .badge-doble, .badge-moba { background-color: var(--danger); }
 
         .table-responsive { overflow-x: auto; margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 15px;}
@@ -373,45 +373,54 @@
 
         <h4 style="margin-top: 25px; text-align: left;">Ubicación en la Matriz de Riesgo Cruzado:</h4>
         <div class="matrix-container">
-            <svg class="matrix-img" viewBox="0 0 1000 520" fill="none" xmlns="http://www.w3.org/2000/svg" style="background:#f8fafc;">
-                <path d="M 90 460 L 960 460" stroke="#d97706" stroke-width="6" marker-end="url(#arrow)"/>
-                <path d="M 90 460 L 90 30" stroke="#334155" stroke-width="6" marker-end="url(#arrow)"/>
-                <text x="525" y="505" fill="#000" font-family="Segoe UI" font-size="20" font-weight="bold" text-anchor="middle">Nivel de Actividad Física (Bajo, Moderado, Alto)</text>
-                <text x="35" y="245" fill="#000" font-family="Segoe UI" font-size="20" font-weight="bold" text-anchor="middle" transform="rotate(-90 35 245)">Nivel de Sedentarismo</text>
-                <text x="65" y="410" fill="#000" font-family="Segoe UI" font-size="18" font-weight="bold" text-anchor="end">Bajo</text>
-                <text x="65" y="255" fill="#000" font-family="Segoe UI" font-size="18" font-weight="bold" text-anchor="end">Moderado</text>
-                <text x="65" y="100" fill="#000" font-family="Segoe UI" font-size="18" font-weight="bold" text-anchor="end">Alto</text>
+            <svg class="matrix-img" viewBox="0 0 1080 520" fill="none" xmlns="http://www.w3.org/2000/svg" style="background:#f8fafc;">
+                <path d="M 170 460 L 1040 460" stroke="#d97706" stroke-width="6" marker-end="url(#arrow)"/>
+                <path d="M 170 460 L 170 30" stroke="#334155" stroke-width="6" marker-end="url(#arrow)"/>
                 
-                <rect x="110" y="30" width="280" height="130" rx="12" fill="#334155"/>
-                <text x="250" y="105" fill="#fff" font-family="Segoe UI" font-size="22" font-weight="bold" text-anchor="middle">Doble Riesgo</text>
-                <rect x="405" y="30" width="280" height="130" rx="12" fill="#4682b4"/>
-                <text x="545" y="85" fill="#fff" font-family="Segoe UI" font-size="20" font-weight="bold" text-anchor="middle">Riesgo Alto-Mod.</text>
-                <text x="545" y="115" fill="#fff" font-family="Segoe UI" font-size="20" font-weight="bold" text-anchor="middle">Actividad</text>
-                <rect x="700" y="30" width="280" height="130" rx="12" fill="#2c1a04" stroke="#ff4500" stroke-width="3"/>
-                <text x="840" y="85" fill="#ffebcd" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">El Estudiante</text>
-                <text x="840" y="115" fill="#ffebcd" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Paradójico</text>
+                <text x="605" y="505" fill="#000" font-family="Segoe UI" font-size="20" font-weight="bold" text-anchor="middle">Nivel de Actividad Física (Bajo, Moderado, Alto)</text>
+                <text x="45" y="245" fill="#000" font-family="Segoe UI" font-size="20" font-weight="bold" text-anchor="middle" transform="rotate(-90 45 245)">Nivel de Sedentarismo</text>
                 
-                <rect x="110" y="175" width="280" height="130" rx="12" fill="#b0c4de"/>
-                <text x="250" y="230" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Riesgo Mod.-Baja Act.</text>
-                <rect x="405" y="175" width="280" height="130" rx="12" fill="#dae8fc"/>
-                <text x="545" y="230" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Moderado-Moderado</text>
-                <rect x="700" y="175" width="280" height="130" rx="12" fill="#ffe5cc"/>
-                <text x="840" y="230" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Mod.-Alta Actividad</text>
+                <text x="145" y="410" fill="#000" font-family="Segoe UI" font-size="18" font-weight="bold" text-anchor="end">Bajo</text>
+                <text x="145" y="255" fill="#000" font-family="Segoe UI" font-size="18" font-weight="bold" text-anchor="end">Moderado</text>
+                <text x="145" y="100" fill="#000" font-family="Segoe UI" font-size="18" font-weight="bold" text-anchor="end">Alto</text>
                 
-                <rect x="110" y="320" width="280" height="130" rx="12" fill="#e1e2e5"/>
-                <text x="250" y="390" fill="#1e293b" font-family="Segoe UI" font-size="21" font-weight="bold" text-anchor="middle">Riesgo Pasivo</text>
-                <rect x="405" y="320" width="280" height="130" rx="12" fill="#eaeaea"/>
-                <text x="545" y="375" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Bajo Riesgo-Mod.</text>
-                <text x="545" y="405" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Actividad</text>
-                <rect x="700" y="320" width="280" height="130" rx="12" fill="#d4edda" stroke="#28a745" stroke-width="4"/>
-                <text x="840" y="390" fill="#155724" font-family="Segoe UI" font-size="22" font-weight="bold" text-anchor="middle">Perfil Óptimo</text>
+                <rect x="190" y="30" width="280" height="130" rx="12" fill="#334155"/>
+                <text x="330" y="105" fill="#fff" font-family="Segoe UI" font-size="22" font-weight="bold" text-anchor="middle">Doble Riesgo</text>
+                
+                <rect x="485" y="30" width="280" height="130" rx="12" fill="#4682b4"/>
+                <text x="625" y="85" fill="#fff" font-family="Segoe UI" font-size="20" font-weight="bold" text-anchor="middle">Riesgo Alto-Mod.</text>
+                <text x="625" y="115" fill="#fff" font-family="Segoe UI" font-size="20" font-weight="bold" text-anchor="middle">Actividad</text>
+                
+                <rect x="780" y="30" width="280" height="130" rx="12" fill="#2c1a04" stroke="#ff4500" stroke-width="3"/>
+                <text x="920" y="85" fill="#ffebcd" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">El Estudiante</text>
+                <text x="920" y="115" fill="#ffebcd" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Paradójico</text>
+                
+                <rect x="190" y="175" width="280" height="130" rx="12" fill="#b0c4de"/>
+                <text x="330" y="250" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Riesgo Mod.-Baja Act.</text>
+                
+                <rect x="485" y="175" width="280" height="130" rx="12" fill="#dae8fc"/>
+                <text x="625" y="250" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Moderado-Moderado</text>
+                
+                <rect x="780" y="175" width="280" height="130" rx="12" fill="#ffe5cc"/>
+                <text x="920" y="250" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Mod.-Alta Actividad</text>
+                
+                <rect x="190" y="320" width="280" height="130" rx="12" fill="#e1e2e5"/>
+                <text x="330" y="390" fill="#1e293b" font-family="Segoe UI" font-size="21" font-weight="bold" text-anchor="middle">Riesgo Pasivo</text>
+                
+                <rect x="485" y="320" width="280" height="130" rx="12" fill="#eaeaea"/>
+                <text x="625" y="375" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Bajo Riesgo-Mod.</text>
+                <text x="625" y="405" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Actividad</text>
+                
+                <rect x="780" y="320" width="280" height="130" rx="12" fill="#d4edda" stroke="#28a745" stroke-width="4"/>
+                <text x="920" y="390" fill="#155724" font-family="Segoe UI" font-size="22" font-weight="bold" text-anchor="middle">Perfil Óptimo</text>
+                
                 <defs>
                     <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                         <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
                     </marker>
                 </defs>
             </svg>
-            <div id="matrix-marker" class="highlight-circle" style="width: 29%; height: 26%; top: 50%; left: 50%; display: none;"></div>
+            <div id="matrix-marker" class="highlight-circle" style="width: 26%; height: 26%; top: 50%; left: 50%; display: none;"></div>
         </div>
 
         <button class="btn" style="background-color: var(--success);" onclick="finalizarYGuardar()">Terminar y Registrar Respuestas</button>
@@ -517,7 +526,6 @@
         archivoPDF_Base64 = localStorage.getItem('archivo_pdf_b64') || "";
         document.getElementById('pdf-name').innerText = nombrePDF_Actual;
         
-        // Limpiar los selectores de consentimiento
         const rbSi = document.getElementById('rb-acepto-si');
         const rbNo = document.getElementById('rb-acepto-no');
         if(rbSi) rbSi.checked = false;
@@ -750,7 +758,7 @@
         currentUserData.asaq_horas_semana = horasSemanalesTotales.toFixed(1);
         currentUserData.asaq_promedio_diario = promedioDiario.toFixed(1);
         currentUserData.componentes_asaq = componentesSuma;
-        currentUserData.asaq_resultado = promedioDiario > 4 ? "Alto Sedentarismo" : "Bajo Sedentarismo";
+        currentUserData.asaq_resultado = promedioDiario > 4 ? "Alto Sedentarismo" : (promedioDiario >= 2.1 ? "Moderado Sedentarismo" : "Bajo Sedentarismo");
 
         document.getElementById('txt-asaq-total-horas').innerText = currentUserData.asaq_horas_semana;
         document.getElementById('txt-asaq-promedio-diario').innerText = currentUserData.asaq_promedio_diario;
@@ -770,47 +778,66 @@
         let colorClase = "";
         let posX = "50%", posY = "50%";
 
-        if (met >= 3000 && horasDia > 4) {
-            clasificacionFinal = "El Estudiante Paradójico";
-            colorClase = "badge-activo-sedentario";
-            explicacion = "Nivel de actividad física alto, pero pasas demasiadas horas al día sentado debido a las exigencias universitarias.";
-            posX = "84%"; posY = "18%";
-        }
-        else if (met >= 600 && horasDia <= 4) {
-            clasificacionFinal = "Perfil Óptimo";
-            colorClase = "badge-activo";
-            explicacion = "Cumples con las recomendaciones de actividad física y mantienes controlado el sedentarismo.";
-            posX = "84%"; posY = "75%";
+        // =========================================================================
+        // MATRIZ DE RIESGO CRUZADO DE 9 CUADRANTES TOTALMENTE DESARROLLADA Y PRECISA
+        // =========================================================================
+
+        // --- FILA 1: ALTO SEDENTARISMO (> 4 horas al día promedio) ---
+        if (horasDia > 4) {
+            if (met >= 3000) {
+                clasificacionFinal = "El Estudiante Paradójico";
+                colorClase = "badge-moba"; 
+                explicacion = "Nivel de actividad física alto, pero pasas demasiadas horas al día sentado debido a las demandas universitarias o académicas.";
+                posX = "85.2%"; posY = "18.2%";
+            } else if (met >= 600) {
+                clasificacionFinal = "Riesgo Alto - Moderada Actividad";
+                colorClase = "badge-alviso";
+                explicacion = "Realizas actividad física regular, pero el volumen sedentario acumulado mitiga parte de los beneficios cardiovasculares.";
+                posX = "57.8%"; posY = "18.2%";
+            } else {
+                clasificacionFinal = "Doble Riesgo";
+                colorClase = "badge-doble";
+                explicacion = "Grave desbalance comportamental: No cumples con el gasto mínimo de ejercicio físico semanal y acumulas un tiempo sedentario adverso.";
+                posX = "30.5%"; posY = "18.2%";
+            }
         } 
-        else if (met >= 600 && horasDia > 4) {
-            clasificacionFinal = "Riesgo Alto - Moderada Actividad";
-            colorClase = "badge-activo-sedentario";
-            explicacion = "Realizas actividad física regular, pero el volumen sedentario acumulado mitiga parte de los beneficios cardiovasculares.";
-            posX = "54.5%"; posY = "18%";
+        // --- FILA 2: MODERADO SEDENTARISMO (Entre 2.1 y 4 horas al día promedio) ---
+        else if (horasDia > 2) {
+            if (met >= 3000) {
+                clasificacionFinal = "Moderado - Alta Actividad";
+                colorClase = "badge-moba";
+                explicacion = "Nivel óptimo de estimulación muscular y aeróbica, balanceando el tiempo estático diario bajo un control adecuado.";
+                posX = "85.2%"; posY = "46.1%";
+            } else if (met >= 600) {
+                clasificacionFinal = "Moderado - Moderado";
+                colorClase = "badge-modmod";
+                explicacion = "Te encuentras en una zona de transición intermedia tanto en gasto energético como en conducta sedentaria.";
+                posX = "57.8%"; posY = "46.1%";
+            } else {
+                clasificacionFinal = "Riesgo Moderado - Baja Actividad";
+                colorClase = "badge-alviso";
+                explicacion = "Tu nivel sedentario es aceptable, pero tu cuota de ejercicio físico estructurado semanal es insuficiente.";
+                posX = "30.5%"; posY = "46.1%";
+            }
         } 
-        else if (met < 600 && horasDia > 4) {
-            clasificacionFinal = "Doble Riesgo";
-            colorClase = "badge-inactivo-sedentario";
-            explicacion = "No cumples con el gasto mínimo de ejercicio físico semanal y acumulas un tiempo sedentario adverso.";
-            posX = "25%"; posY = "18%";
-        }
-        else if (met < 600 && horasDia <= 4 && horasDia > 2) {
-            clasificacionFinal = "Riesgo Moderado - Baja Actividad";
-            colorClase = "badge-moderado";
-            explicacion = "Tu nivel de entrenamiento estructurado es bajo, compensado parcialmente por pocas horas estáticas.";
-            posX = "25%"; posY = "46%";
-        }
-        else if (met >= 100 && met < 600 && horasDia <= 2) {
-            clasificacionFinal = "Riesgo Pasivo";
-            colorClase = "badge-moderado-sedentario";
-            explicacion = "Nivel sedentario controlado, pero la cuota de estimulación muscular semanal es insuficiente.";
-            posX = "25%"; posY = "75%";
-        }
+        // --- FILA 3: BAJO SEDENTARISMO (<= 2 horas al día promedio) ---
         else {
-            clasificacionFinal = "Moderado - Moderado";
-            colorClase = "badge-moderado";
-            explicacion = "Te encuentras en la zona media de ambas clasificaciones cruzadas.";
-            posX = "54.5%"; posY = "46%";
+            if (met >= 3000) {
+                clasificacionFinal = "Perfil Óptimo";
+                colorClase = "badge-optimo";
+                explicacion = "¡Excelente estado! Cumples con las recomendaciones máximas de actividad física estructurada y mantienes controlado el sedentarismo al mínimo.";
+                posX = "85.2%"; posY = "75%";
+            } else if (met >= 600) {
+                clasificacionFinal = "Bajo Riesgo-Mod. Actividad";
+                colorClase = "badge-modmod";
+                explicacion = "Mantienes un nivel de actividad física saludable y un tiempo sedentario muy bajo. Nivel de riesgo cardiovascular mínimo.";
+                posX = "57.8%"; posY = "75%";
+            } else {
+                clasificacionFinal = "Riesgo Pasivo";
+                colorClase = "badge-alviso";
+                explicacion = "Tu nivel sedentario está controlado de forma sobresaliente, pero la cuota de estimulación muscular semanal es deficiente.";
+                posX = "30.5%"; posY = "75%";
+            }
         }
 
         currentUserData.perfil_combinado = clasificacionFinal;
@@ -820,6 +847,7 @@
         bFinal.className = `result-badge ${colorClase}`;
         document.getElementById('txt-explicacion-final').innerText = explicacion;
 
+        // Mostrar el marcador animado en su respectiva celda corregida
         const marker = document.getElementById('matrix-marker');
         marker.style.left = posX; marker.style.top = posY; marker.style.display = "block";
 
