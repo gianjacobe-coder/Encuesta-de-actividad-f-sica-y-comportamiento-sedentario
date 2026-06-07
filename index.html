@@ -157,9 +157,10 @@
             margin-top: 10px;
             color: white;
         }
-        .badge-alto, .badge-activo-sedentario, .badge-activo, .badge-optimo { background-color: var(--success); }
-        .badge-moderado, .badge-moderado-sedentario, .badge-alviso, .badge-modmod { background-color: #eab308; color: black; }
-        .badge-bajo, .badge-inactivo-sedentario, .badge-doble, .badge-moba { background-color: var(--danger); }
+        .badge-alto, .badge-optimo { background-color: var(--success); }
+        .badge-moderado, .badge-modmod { background-color: #eab308; color: black; }
+        .badge-bajo, .badge-doble { background-color: var(--danger); }
+        .badge-alviso { background-color: #f97316; } /* Color Naranja */
 
         .table-responsive { overflow-x: auto; margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 15px;}
@@ -207,16 +208,16 @@
             position: absolute;
             border: 4px solid #dc2626;
             border-radius: 50%;
-            background-color: rgba(220, 38, 38, 0.15);
+            background-color: rgba(220, 38, 38, 0.25);
             pointer-events: none;
-            box-shadow: 0 0 12px #dc2626;
+            box-shadow: 0 0 14px #dc2626;
             transform: translate(-50%, -50%);
             transition: all 0.5s ease;
             animation: pulse-circle 1.5s infinite alternate;
         }
         @keyframes pulse-circle {
-            0% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.8; }
-            100% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; }
+            0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
         }
 
         .btn-delete-row {
@@ -361,8 +362,8 @@
         
         <table>
             <tr><th style="width: 40%;">Prueba / Indicador</th><th>Resultado Numérico y Métricas</th></tr>
-            <tr><td><strong>IPAQ</strong> (Actividad Física)</td><td><span id="lbl-num-ipaq">0</span> MET-min/sem</td></tr>
-            <tr><td><strong>ASAQ</strong> (Sedentarismo)</td><td><span id="lbl-num-asaq">0</span> horas/semana</td></tr>
+            <tr><td><strong>IPAQ</strong> (Actividad Física)</td><td><span id="lbl-num-ipaq">0</span> MET-min/sem (<span id="lbl-cat-ipaq">Bajo</span>)</td></tr>
+            <tr><td><strong>ASAQ</strong> (Sedentarismo)</td><td><span id="lbl-num-asaq">0</span> horas/semana (<span id="lbl-cat-asaq">Bajo</span>)</td></tr>
         </table>
 
         <div class="result-box" style="background-color: #f0fdf4; border: 2px solid var(--success); padding: 25px;">
@@ -380,39 +381,44 @@
                 <text x="605" y="505" fill="#000" font-family="Segoe UI" font-size="20" font-weight="bold" text-anchor="middle">Nivel de Actividad Física (Bajo, Moderado, Alto)</text>
                 <text x="45" y="245" fill="#000" font-family="Segoe UI" font-size="20" font-weight="bold" text-anchor="middle" transform="rotate(-90 45 245)">Nivel de Sedentarismo</text>
                 
-                <text x="145" y="410" fill="#000" font-family="Segoe UI" font-size="18" font-weight="bold" text-anchor="end">Bajo</text>
-                <text x="145" y="255" fill="#000" font-family="Segoe UI" font-size="18" font-weight="bold" text-anchor="end">Moderado</text>
+                <text x="145" y="390" fill="#000" font-family="Segoe UI" font-size="18" font-weight="bold" text-anchor="end">Bajo</text>
+                <text x="145" y="245" fill="#000" font-family="Segoe UI" font-size="18" font-weight="bold" text-anchor="end">Moderado</text>
                 <text x="145" y="100" fill="#000" font-family="Segoe UI" font-size="18" font-weight="bold" text-anchor="end">Alto</text>
                 
                 <rect x="190" y="30" width="280" height="130" rx="12" fill="#334155"/>
                 <text x="330" y="105" fill="#fff" font-family="Segoe UI" font-size="22" font-weight="bold" text-anchor="middle">Doble Riesgo</text>
                 
                 <rect x="485" y="30" width="280" height="130" rx="12" fill="#4682b4"/>
-                <text x="625" y="85" fill="#fff" font-family="Segoe UI" font-size="20" font-weight="bold" text-anchor="middle">Riesgo Alto-Mod.</text>
-                <text x="625" y="115" fill="#fff" font-family="Segoe UI" font-size="20" font-weight="bold" text-anchor="middle">Actividad</text>
+                <text x="625" y="85" fill="#fff" font-family="Segoe UI" font-size="20" font-weight="bold" text-anchor="middle">Riesgo Alto -</text>
+                <text x="625" y="115" fill="#fff" font-family="Segoe UI" font-size="20" font-weight="bold" text-anchor="middle">Mod. Actividad</text>
                 
                 <rect x="780" y="30" width="280" height="130" rx="12" fill="#2c1a04" stroke="#ff4500" stroke-width="3"/>
                 <text x="920" y="85" fill="#ffebcd" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">El Estudiante</text>
                 <text x="920" y="115" fill="#ffebcd" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Paradójico</text>
                 
                 <rect x="190" y="175" width="280" height="130" rx="12" fill="#b0c4de"/>
-                <text x="330" y="250" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Riesgo Mod.-Baja Act.</text>
+                <text x="330" y="230" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Riesgo Intermedio -</text>
+                <text x="330" y="260" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Baja Actividad</text>
                 
                 <rect x="485" y="175" width="280" height="130" rx="12" fill="#dae8fc"/>
-                <text x="625" y="250" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Moderado-Moderado</text>
+                <text x="625" y="230" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Riesgo Medio -</text>
+                <text x="625" y="260" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Mod. Actividad</text>
                 
                 <rect x="780" y="175" width="280" height="130" rx="12" fill="#ffe5cc"/>
-                <text x="920" y="250" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Mod.-Alta Actividad</text>
+                <text x="920" y="230" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Riesgo Bajo -</text>
+                <text x="920" y="260" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Alta Actividad</text>
                 
                 <rect x="190" y="320" width="280" height="130" rx="12" fill="#e1e2e5"/>
-                <text x="330" y="390" fill="#1e293b" font-family="Segoe UI" font-size="21" font-weight="bold" text-anchor="middle">Riesgo Pasivo</text>
+                <text x="330" y="375" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Riesgo Moderado -</text>
+                <text x="330" y="405" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Baja Actividad</text>
                 
                 <rect x="485" y="320" width="280" height="130" rx="12" fill="#eaeaea"/>
-                <text x="625" y="375" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Bajo Riesgo-Mod.</text>
-                <text x="625" y="405" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Actividad</text>
+                <text x="625" y="375" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Bajo riesgo -</text>
+                <text x="625" y="405" fill="#1e293b" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Mod actividad</text>
                 
                 <rect x="780" y="320" width="280" height="130" rx="12" fill="#d4edda" stroke="#28a745" stroke-width="4"/>
-                <text x="920" y="390" fill="#155724" font-family="Segoe UI" font-size="22" font-weight="bold" text-anchor="middle">Perfil Óptimo</text>
+                <text x="920" y="375" fill="#155724" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Riesgo Mínimo -</text>
+                <text x="920" y="405" fill="#155724" font-family="Segoe UI" font-size="19" font-weight="bold" text-anchor="middle">Alta actividad</text>
                 
                 <defs>
                     <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -420,7 +426,7 @@
                     </marker>
                 </defs>
             </svg>
-            <div id="matrix-marker" class="highlight-circle" style="width: 26%; height: 26%; top: 50%; left: 50%; display: none;"></div>
+            <div id="matrix-marker" class="highlight-circle" style="width: 32px; height: 32px; display: none;"></div>
         </div>
 
         <button class="btn" style="background-color: var(--success);" onclick="finalizarYGuardar()">Terminar y Registrar Respuestas</button>
@@ -758,7 +764,7 @@
         currentUserData.asaq_horas_semana = horasSemanalesTotales.toFixed(1);
         currentUserData.asaq_promedio_diario = promedioDiario.toFixed(1);
         currentUserData.componentes_asaq = componentesSuma;
-        currentUserData.asaq_resultado = promedioDiario > 4 ? "Alto Sedentarismo" : (promedioDiario >= 2.1 ? "Moderado Sedentarismo" : "Bajo Sedentarismo");
+        currentUserData.asaq_resultado = promedioDiario > 4 ? "Alto" : (promedioDiario >= 2.1 ? "Moderado" : "Bajo");
 
         document.getElementById('txt-asaq-total-horas').innerText = currentUserData.asaq_horas_semana;
         document.getElementById('txt-asaq-promedio-diario').innerText = currentUserData.asaq_promedio_diario;
@@ -768,96 +774,110 @@
 
     function mostrarConsolidado() {
         document.getElementById('lbl-num-ipaq').innerText = currentUserData.ipaq_mets;
+        document.getElementById('lbl-cat-ipaq').innerText = currentUserData.ipaq_resultado;
         document.getElementById('lbl-num-asaq').innerText = currentUserData.asaq_horas_semana;
+        document.getElementById('lbl-cat-asaq').innerText = currentUserData.asaq_resultado;
 
-        const met = currentUserData.ipaq_mets;
-        const horasDia = parseFloat(currentUserData.asaq_promedio_diario);
+        const catActFisica = currentUserData.ipaq_resultado.toLowerCase(); // 'bajo', 'moderado', 'alto'
+        const catSedentarismo = currentUserData.asaq_resultado.toLowerCase(); // 'bajo', 'moderado', 'alto'
         
         let clasificacionFinal = "";
         let explicacion = "";
         let colorClase = "";
-        let posX = "50%", posY = "50%";
+        
+        // Coordenadas exactas para el centro de cada celda del SVG (viewBox 0 0 1080 520)
+        let posX = "0px", posY = "0px";
 
         // =========================================================================
-        // MATRIZ DE RIESGO CRUZADO DE 9 CUADRANTES TOTALMENTE DESARROLLADA Y PRECISA
+        // CONFIGURACIÓN METODOLÓGICA DE LA MATRIZ DE RIESGO CRUZADO (3x3 ESTRICTO)
         // =========================================================================
+        const definicionMatriz = {
+            bajo: { // FILA INFERIOR: BAJO SEDENTARISMO
+                bajo: {
+                    titulo: "Riesgo Moderado - Baja Actividad",
+                    explicacion: "Tu nivel de sedentarismo está bien controlado, pero tu cuota de ejercicio físico estructurado semanal es deficiente.",
+                    color: "badge-moderado", X: "330px", Y: "385px"
+                },
+                moderado: {
+                    titulo: "Bajo riesgo - Mod actividad", // <-- Caso de éxito de la validación
+                    explicacion: "Mantienes un nivel de actividad física saludable y un tiempo sedentario muy bajo. Nivel de riesgo cardiovascular mínimo.",
+                    color: "badge-modmod", X: "625px", Y: "385px"
+                },
+                alto: {
+                    titulo: "Riesgo Mínimo - Alta actividad",
+                    explicacion: "¡Excelente estado! Cumples con las recomendaciones máximas de actividad física estructurada y mantienes controlado el sedentarismo al mínimo.",
+                    color: "badge-optimo", X: "920px", Y: "385px"
+                }
+            },
+            moderado: { // FILA CENTRAL: MODERADO SEDENTARISMO
+                bajo: {
+                    titulo: "Riesgo Intermedio - Baja Actividad",
+                    explicacion: "Zona crítica: Presentas bajos niveles de estimulación física y pasas un tiempo considerable en conductas estáticas.",
+                    color: "badge-alviso", X: "330px", Y: "240px"
+                },
+                moderado: {
+                    titulo: "Riesgo Medio - Mod. Actividad",
+                    explicacion: "Te encuentras en una zona de transición intermedia tanto en gasto energético como en conducta sedentaria.",
+                    color: "badge-modmod", X: "625px", Y: "240px"
+                },
+                alto: {
+                    titulo: "Riesgo Bajo - Alta Actividad",
+                    explicacion: "Nivel óptimo de estimulación muscular y aeróbica, balanceando el tiempo estático diario bajo un control adecuado.",
+                    color: "badge-modmod", X: "920px", Y: "240px"
+                }
+            },
+            alto: { // FILA SUPERIOR: ALTO SEDENTARISMO
+                bajo: {
+                    titulo: "Doble Riesgo",
+                    explicacion: "Grave desbalance comportamental: No cumples con el gasto mínimo de ejercicio físico semanal y acumulas un tiempo sedentario adverso.",
+                    color: "badge-doble", X: "330px", Y: "95px"
+                },
+                moderado: {
+                    titulo: "Riesgo Alto - Mod. Actividad",
+                    explicacion: "Realizas actividad física regular, pero el volumen sedentario acumulado mitiga parte de los beneficios cardiovasculares.",
+                    color: "badge-alviso", X: "625px", Y: "95px"
+                },
+                alto: {
+                    titulo: "El Estudiante Paradójico",
+                    explicacion: "Nivel de actividad física alto, pero pasas demasiadas horas al día sentado debido a las demandas universitarias o académicas.",
+                    color: "badge-alviso", X: "920px", Y: "95px"
+                }
+            }
+        };
 
-        // --- FILA 1: ALTO SEDENTARISMO (> 4 horas al día promedio) ---
-        if (horasDia > 4) {
-            if (met >= 3000) {
-                clasificacionFinal = "El Estudiante Paradójico";
-                colorClase = "badge-moba"; 
-                explicacion = "Nivel de actividad física alto, pero pasas demasiadas horas al día sentado debido a las demandas universitarias o académicas.";
-                posX = "85.2%"; posY = "18.2%";
-            } else if (met >= 600) {
-                clasificacionFinal = "Riesgo Alto - Moderada Actividad";
-                colorClase = "badge-alviso";
-                explicacion = "Realizas actividad física regular, pero el volumen sedentario acumulado mitiga parte de los beneficios cardiovasculares.";
-                posX = "57.8%"; posY = "18.2%";
-            } else {
-                clasificacionFinal = "Doble Riesgo";
-                colorClase = "badge-doble";
-                explicacion = "Grave desbalance comportamental: No cumples con el gasto mínimo de ejercicio físico semanal y acumulas un tiempo sedentario adverso.";
-                posX = "30.5%"; posY = "18.2%";
-            }
-        } 
-        // --- FILA 2: MODERADO SEDENTARISMO (Entre 2.1 y 4 horas al día promedio) ---
-        else if (horasDia > 2) {
-            if (met >= 3000) {
-                clasificacionFinal = "Moderado - Alta Actividad";
-                colorClase = "badge-moba";
-                explicacion = "Nivel óptimo de estimulación muscular y aeróbica, balanceando el tiempo estático diario bajo un control adecuado.";
-                posX = "85.2%"; posY = "46.1%";
-            } else if (met >= 600) {
-                clasificacionFinal = "Moderado - Moderado";
-                colorClase = "badge-modmod";
-                explicacion = "Te encuentras en una zona de transición intermedia tanto en gasto energético como en conducta sedentaria.";
-                posX = "57.8%"; posY = "46.1%";
-            } else {
-                clasificacionFinal = "Riesgo Moderado - Baja Actividad";
-                colorClase = "badge-alviso";
-                explicacion = "Tu nivel sedentario es aceptable, pero tu cuota de ejercicio físico estructurado semanal es insuficiente.";
-                posX = "30.5%"; posY = "46.1%";
-            }
-        } 
-        // --- FILA 3: BAJO SEDENTARISMO (<= 2 horas al día promedio) ---
-        else {
-            if (met >= 3000) {
-                clasificacionFinal = "Perfil Óptimo";
-                colorClase = "badge-optimo";
-                explicacion = "¡Excelente estado! Cumples con las recomendaciones máximas de actividad física estructurada y mantienes controlado el sedentarismo al mínimo.";
-                posX = "85.2%"; posY = "75%";
-            } else if (met >= 600) {
-                clasificacionFinal = "Bajo Riesgo-Mod. Actividad";
-                colorClase = "badge-modmod";
-                explicacion = "Mantienes un nivel de actividad física saludable y un tiempo sedentario muy bajo. Nivel de riesgo cardiovascular mínimo.";
-                posX = "57.8%"; posY = "75%";
-            } else {
-                clasificacionFinal = "Riesgo Pasivo";
-                colorClase = "badge-alviso";
-                explicacion = "Tu nivel sedentario está controlado de forma sobresaliente, pero la cuota de estimulación muscular semanal es deficiente.";
-                posX = "30.5%"; posY = "75%";
-            }
-        }
+        // Extraer datos calculados de forma segura
+        const cuadranteAsignado = definicionMatriz[catSedentarismo][catActFisica];
+
+        clasificacionFinal = cuadranteAsignado.titulo;
+        explicacion = cuadranteAsignado.explicacion;
+        colorClase = cuadranteAsignado.color;
+        posX = cuadranteAsignado.X;
+        posY = cuadranteAsignado.Y;
 
         currentUserData.perfil_combinado = clasificacionFinal;
 
+        // Renderizar distintivos dinámicos en la UI
         const bFinal = document.getElementById('badge-clasificacion-final');
         bFinal.innerText = clasificacionFinal.toUpperCase();
         bFinal.className = `result-badge ${colorClase}`;
         document.getElementById('txt-explicacion-final').innerText = explicacion;
 
-        // Mostrar el marcador animado en su respectiva celda corregida
+        // Posicionar el círculo animado de forma proporcional dentro del contenedor SVG relativo
         const marker = document.getElementById('matrix-marker');
-        marker.style.left = posX; marker.style.top = posY; marker.style.display = "block";
+        
+        // Convertimos las coordenadas de píxeles absolutos del SVG a porcentajes basados en el viewBox (1080x520)
+        const pctX = (parseFloat(posX) / 1080) * 100;
+        const pctY = (parseFloat(posY) / 520) * 100;
+
+        marker.style.left = `${pctX}%`; 
+        marker.style.top = `${pctY}%`; 
+        marker.style.display = "block";
 
         switchView('view-consolidado');
     }
 
     function finalizarYGuardar() {
         const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbxUKeudP6-ERSYbeiw9ruSBautt8JMA2I6tS4wqV0gF5U5Y0N-8PJyG8YEm46Odp7o/exec"; 
-
-        currentUserData.perfil_combinado = document.getElementById('badge-clasificacion-final').innerText;
 
         const botonTerminar = document.querySelector("button[onclick='finalizarYGuardar()']");
         if(botonTerminar) {
