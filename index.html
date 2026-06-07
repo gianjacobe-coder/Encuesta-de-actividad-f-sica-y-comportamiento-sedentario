@@ -811,10 +811,43 @@
     }
 
     function finalizarYGuardar() {
-        dbRespuestas.push({ ...currentUserData, respuestas_detalladas: { ...respuestasTemporales }, fecha_registro: new Date().toLocaleString() });
-        localStorage.setItem('db_encuestas', JSON.stringify(dbRespuestas));
-        alert('Respuestas registradas con éxito.'); resetApp();
+    // Agrega la URL que te dio Google Apps Script al implementar
+    const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbxUKeudP6-ERSYbeiw9ruSBautt8JMA2I6tS4wqV0gF5U5Y0N-8PJyG8YEm46Odp7o/exec"; 
+
+    // Al agregar el diagnóstico cruzado al objeto, nos aseguramos de que vaya completo a la nube
+    currentUserData.perfil_combinado = document.getElementById('badge-clasificacion-final').innerText;
+
+    // Deshabilitar temporalmente el botón para evitar que el usuario haga doble clic rápido
+    const botonTerminar = document.querySelector("button[onclick='finalizarYGuardar()']");
+    if(botonTerminar) {
+        botonTerminar.innerText = "⏳ Guardando en la nube...";
+        botonTerminar.disabled = true;
     }
+
+    // Enviar los datos en tiempo real mediante la API Fetch
+    fetch(URL_GOOGLE_SCRIPT, {
+        method: "POST",
+        mode: "no-cors", // Evita problemas de políticas CORS en navegadores estrictos
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(currentUserData)
+    })
+    .then(() => {
+        // Al usar 'no-cors' la respuesta llega opaca, asumimos éxito si no salta al catch
+        alert('¡Respuestas registradas con éxito en la base de datos central!');
+        resetApp();
+    })
+    .catch(error => {
+        console.error("Error al enviar los datos:", error);
+        alert('Hubo un problema de conexión al guardar los datos. Inténtalo de nuevo.');
+        if(botonTerminar) {
+            botonTerminar.innerText = "Terminar y Registrar Respuestas";
+            botonTerminar.disabled = false;
+        }
+    });
+}
+ 
 
     function actualizarTablaAdmin() {
         const tbody = document.querySelector('#tabla-respuestas tbody'); tbody.innerHTML = '';
